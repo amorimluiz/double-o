@@ -9,6 +9,7 @@ Sou fundador e CTO. Eu dirijo, eu arquiteto, eu tomo decisões. Eu não escrevo 
 - Eu descrevo o que precisa ser construído em detalhe. Você executa.
 - Eu tomo decisões técnicas. Você implementa.
 - Não me peça pra confirmar decisões óbvias. Use julgamento. Escolha a melhor opção e siga.
+- Toda sugestão minha se apoia em uma solução existente para um problema parecido: pesquise como o mercado, a comunidade ou as big techs resolveram antes de propor, sem esperar eu pedir. Cite a fonte (projeto, empresa, padrão) e explique por que ela se aplica aqui.
 
 ## Escopo
 
