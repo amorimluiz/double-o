@@ -14,6 +14,7 @@ O repositório gerencia apenas o que é **dele**: instruções, rules, skills e 
    - Ex.: `C:\Users\<voce>\projects\double-o` (Windows) ou `~/projects/double-o` (Unix).
    - `REPO` é uma entrada do setup, **não** um dado versionado: o repo não guarda caminho absoluto. A fonte do caminho é o próprio clone — este `SETUP.md` fica na raiz dele.
 2. Confirme que o caminho é estável. Symlinks quebram se o repositório for movido.
+3. Node.js e Python 3 são pré-requisitos para as skills funcionarem: Node.js (npm/npx) para as CLIs instaladas via npm e Python 3 para os scripts auxiliares de `deep-review` e `qa-report`. Confirme com `node --version` e `python3 --version` (Windows: `python --version`; instale com `winget install Python.Python.3.13`).
 
 ## Parte 1 — Artefatos do repositório (symlinks)
 
@@ -70,7 +71,6 @@ Estas ferramentas trazem binário e artefatos próprios. **Não** os crie nem os
 | skills CLI (`npx skills`) | instalar e atualizar skills | sem install; use `npx skills` | `npx skills --version` |
 | ctx7 | skill `context7` | `npm i -g ctx7@latest` | `ctx7 --version` |
 | agent-browser | skills `agent-browser` e `qa-execution` | `npm i -g agent-browser && agent-browser install` | `agent-browser --version` |
-| Python 3 | scripts auxiliares de `deep-review` e `qa-report` | `winget install Python.Python.3.13` (Windows) ou o gerenciador do sistema (Unix) | `python3 --version` (Windows: `python --version`) |
 
 O lock do skills CLI é estado local da máquina e **não** é versionado. A procedência canônica e versionada das skills fica em `skills-lock.json` na raiz do repo.
 
@@ -91,10 +91,6 @@ O lock do skills CLI é estado local da máquina e **não** é versionado. A pro
 2. `agent-browser install` baixa o Chrome dedicado (~200 MB) para `~/.agent-browser/browsers/`. O npm pode bloquear o postinstall da lib (política `allow-scripts`); o `agent-browser install` explícito resolve — não é preciso liberar o script de instalação.
 3. O `ctx7` funciona sem autenticação; `ctx7 login` (OAuth) ou `CONTEXT7_API_KEY` elevam o limite de uso.
 
-### Python
-
-`deep-review` e `qa-report` rodam scripts Python auxiliares; sem o interpretador, essas skills operam parcialmente. No Windows, `winget install Python.Python.3.13` instala por usuário e entra no PATH — abra um terminal novo depois.
-
 ### Dependências do plugin (opencode)
 
 O diretório global do opencode precisa das dependências do plugin:
@@ -114,7 +110,7 @@ Para cada link criado:
 3. O harness inicia sem erro e enxerga os artefatos:
    - opencode: `/init` não deve recriar `AGENTS.md`; skills aparecem na lista de skills disponíveis.
 4. Para libs: `rtk init --show` lista a integração do harness como instalada.
-5. Ferramentas externas: rode os comandos de verificação da tabela da Parte 2. Um comando que falha indica uma skill quebrada naquela máquina.
+5. Ferramentas externas: rode os comandos de verificação da tabela da Parte 2 e os pré-requisitos da seção anterior. Um comando que falha indica uma skill quebrada naquela máquina.
 
 ## Se algo der errado
 
