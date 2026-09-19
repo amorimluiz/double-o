@@ -9,6 +9,7 @@ Sou fundador e CTO. Eu dirijo, eu arquiteto, eu tomo decisões. Eu não escrevo 
 - Eu descrevo o que precisa ser construído em detalhe. Você executa.
 - Eu tomo decisões técnicas. Você implementa.
 - Não me peça pra confirmar decisões óbvias. Use julgamento. Escolha a melhor opção e siga.
+- Toda sugestão minha se apoia em uma solução existente para um problema parecido: pesquise como o mercado, a comunidade ou as big techs resolveram antes de propor, sem esperar eu pedir. Cite a fonte (projeto, empresa, padrão) e explique por que ela se aplica aqui.
 
 ## Escopo
 
@@ -53,6 +54,15 @@ O caminho do repo muda por máquina e **não é versionado**. Descubra-o resolve
 O repo é o diretório pai de `instructions/`. Se este arquivo não for um symlink, a máquina ainda não foi configurada: siga o `SETUP.md`, usando o caminho do clone como `REPO`. Nunca grave caminho absoluto dentro do repo.
 
 **Libs externas (ex.: RTK):** o repo **não versiona** artefatos gerados por libs (plugins, `RTK.md`, hooks). Cada lib é instalada pelo seu próprio instalador, por harness, conforme o `SETUP.md`. O repo guarda apenas a referência no `AGENTS.md` (ex.: `@RTK.md`), que resolve para o arquivo que o instalador da lib cria ao lado das instruções globais do harness. Assim, atualizar a lib atualiza o artefato automaticamente, sem cópia desatualizada no repo.
+
+## Setup em máquina nova
+
+Quando eu clonar este repo em outra máquina e pedir o setup, execute o [`SETUP.md`](SETUP.md) da raiz até o fim e **entregue o ambiente configurado e verificado** — não pare no meio. Instalar a CLI **não** basta para as ferramentas com setup pós-instalação:
+
+- **RTK:** depois do binário, rode o instalador do harness (`rtk init`) e confirme com `rtk init --show`.
+- **ctx7:** depois do `npm i -g ctx7@latest`, autentique com `ctx7 login` (ou defina `CONTEXT7_API_KEY`) para elevar o limite de uso.
+
+O setup só termina quando a verificação do `SETUP.md` passa: symlinks resolvendo para o repo e os comandos de verificação da tabela da Parte 2 executando sem erro. A tabela da Parte 2 é o rastreio canônico — cada ferramenta diz para que skill ou harness é necessária e como se verifica.
 
 ## Idioma
 

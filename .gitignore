@@ -20,3 +20,6 @@ __pycache__/
 
 # SDD pipeline workspace (local by design)
 .sdd/
+
+# Parallel agent worktrees (local by design)
+.worktrees/
