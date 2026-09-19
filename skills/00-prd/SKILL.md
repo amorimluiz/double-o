@@ -32,7 +32,7 @@ Update `.sdd/<slug>/state.yml` at every completed step; full schema in the sibli
 
 1. Resolve the workspace and read `prd.md` when present. Update mode: preserve approved sections and mirror changes into Open Questions.
 2. Discover context on two tracks before asking anything:
-   - Codebase: search files, patterns, data models, and integration points related to the request. Use the runtime's subagent tool when available.
+   - Codebase: search files, patterns, data models, and integration points related to the request. For research that spans independent areas, use the `agent-exploration` skill (parallel scoped explorers with written results); otherwise use the runtime's subagent tool or search directly.
    - Market: 3-5 web searches on competing products, conventions, and user expectations. When no web tool exists, state the limitation and proceed with the codebase track.
    Present the merged findings, 3-5 bullets per track, to the user.
 3. Grill the requirements: read `references/question-protocol.md` and walk its decision tree branch by branch until every load-bearing product decision is resolved or parked in Open Questions with the user's consent.

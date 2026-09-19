@@ -3,17 +3,53 @@
   "description": "Canonical, versioned provenance for the skills vendored in this repo. The skills CLI writes its own machine-local state to ~/.agents/.skill-lock.json, which is generated and not versioned.",
   "hashAlgorithm": "sha256 over each file's relative path + content, files ordered by path (skills CLI computeSkillFolderHash)",
   "skills": {
+    "agent-browser": {
+      "source": "pedronauck/skills",
+      "sourceType": "github",
+      "skillPath": "skills/curated/agent-browser/SKILL.md",
+      "computedHash": "a8853bcca9385c4998ee2bfbe4139b52b51596dc2f45414a9ee712e3c0827cfd"
+    },
+    "agent-exploration": {
+      "source": "pedronauck/skills",
+      "sourceType": "github",
+      "skillPath": "skills/mine/agent-exploration/SKILL.md",
+      "computedHash": "ff3979fc1f15895a38d4570ad687d7dc1050fe847f20fc5803e0bf7b6e7ec36c"
+    },
     "agent-md-refactor": {
       "source": "softaworks/agent-toolkit",
       "sourceType": "github",
       "skillPath": "skills/agent-md-refactor/SKILL.md",
       "computedHash": "11d1ffbb2d9f180d63dabfb0b6c63a4632b4c0e2e6be1660c7651cef0f3f1c07"
     },
+    "architectural-analysis": {
+      "source": "pedronauck/skills",
+      "sourceType": "github",
+      "skillPath": "skills/mine/architectural-analysis/SKILL.md",
+      "computedHash": "f53f423b7edba88092e423800ef2f3a4d018538f538c3426b266306ac67c2be4"
+    },
+    "context7": {
+      "source": "pedronauck/skills",
+      "sourceType": "github",
+      "skillPath": "skills/curated/context7/SKILL.md",
+      "computedHash": "29596f2492648d436b1e45a79d5903899ed553b809bd19844d1b216be97133a1"
+    },
     "create-readme": {
       "source": "github/awesome-copilot",
       "sourceType": "github",
       "skillPath": "skills/create-readme/SKILL.md",
       "computedHash": "d0ece1b2164ce1376e4ab6e98d6ac079df3a2a94f5f02224362b6a1ce2516ae9"
+    },
+    "deep-review": {
+      "source": "pedronauck/skills",
+      "sourceType": "github",
+      "skillPath": "skills/mine/deep-review/SKILL.md",
+      "computedHash": "bfc0e7cfbba033c01aa9c7b921c2e89f998834a3a32f3d7d1dcc9634b6f338f1"
+    },
+    "documentation-writer": {
+      "source": "pedronauck/skills",
+      "sourceType": "github",
+      "skillPath": "skills/curated/documentation-writer/SKILL.md",
+      "computedHash": "9d0cd266c12561f9c60fa823c3624beb1df77b1620cfcf4121718703bcd46110"
     },
     "find-skills": {
       "source": "vercel-labs/skills",
@@ -31,7 +67,43 @@
       "source": "anthropics/skills",
       "sourceType": "github",
       "skillPath": "skills/frontend-design/SKILL.md",
-      "computedHash": "106acf230014cbb43ca34e6410371321b56ca742f9ee0442e8ec05bf02eb0384"
+      "computedHash": "89496d5dd00f4810205f351759594fc2742bf8eea85a2f2b2d1de59f4bd91576"
+    },
+    "lesson-learned": {
+      "source": "pedronauck/skills",
+      "sourceType": "github",
+      "skillPath": "skills/curated/lesson-learned/SKILL.md",
+      "computedHash": "58e2a4062f3f113177658ef822dfc52ca10997a41b71098a6ae809b8f5ab316c"
+    },
+    "mermaid-diagrams": {
+      "source": "pedronauck/skills",
+      "sourceType": "github",
+      "skillPath": "skills/curated/mermaid-diagrams/SKILL.md",
+      "computedHash": "b6c206a3cab0333a1d3d3cf27114099d0d5f25eb07d86c8f12472b7aa7d59a4c"
+    },
+    "qa-execution": {
+      "source": "pedronauck/skills",
+      "sourceType": "github",
+      "skillPath": "skills/mine/qa-execution/SKILL.md",
+      "computedHash": "22fb4d9f9ba89ac65d16289456c20956acf808d18fa292a3d6380b4fff466a2d"
+    },
+    "qa-report": {
+      "source": "pedronauck/skills",
+      "sourceType": "github",
+      "skillPath": "skills/mine/qa-report/SKILL.md",
+      "computedHash": "90a66d78d622a2c0bd7b7231f7a3d53fa495857c6b8fafce4ce6e2fed51bee1d"
+    },
+    "systematic-debugging": {
+      "source": "pedronauck/skills",
+      "sourceType": "github",
+      "skillPath": "skills/curated/systematic-debugging/SKILL.md",
+      "computedHash": "73ff374e2b8d70d5901ef5fd5f592713e322fb37737cd4bb494c215be748003a"
+    },
+    "to-prompt": {
+      "source": "pedronauck/skills",
+      "sourceType": "github",
+      "skillPath": "skills/mine/to-prompt/SKILL.md",
+      "computedHash": "fe84d9dcd5418b52b333126507f57b93744fd6a46fbbbe7b84ca53ebb04dd100"
     },
     "writing-for-agents": {
       "source": "mattpocock/skills",

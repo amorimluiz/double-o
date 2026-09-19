@@ -14,5 +14,9 @@ desktop.ini
 node_modules/
 *.log
 
+# Python caches (vendored skill scripts)
+__pycache__/
+*.pyc
+
 # SDD pipeline workspace (local by design)
 .sdd/

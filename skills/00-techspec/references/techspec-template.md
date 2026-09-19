@@ -14,6 +14,8 @@ Main components, their responsibilities, and their relationships:
 - Data flow between components
 - External system interactions
 
+Include an inline Mermaid diagram when it makes the architecture or a flow clearer than prose; use the `mermaid-diagrams` skill when available.
+
 ## Implementation Design
 
 ### Core Interfaces
