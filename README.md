@@ -24,15 +24,11 @@ double-o/
 │   └── AGENTS.md          # Global governance (not auto-loaded from here)
 ├── rules/                 # Engineering standards, one topic per file
 ├── skills/                # Canonical skills, one folder per skill
-│   ├── 00-loop/            # SDD pipeline: entry point + execution loop
-│   ├── 00-prd/             # SDD pipeline: product requirements
-│   ├── 00-tasks/           # SDD pipeline: task graph
-│   ├── 00-techspec/        # SDD pipeline: technical design
-│   ├── agent-md-refactor/
-│   ├── create-readme/
-│   ├── find-skills/
-│   ├── folder-structure-blueprint-generator/
-│   └── writing-for-agents/
+│   ├── 00-loop/           # SDD pipeline: entry point + execution loop
+│   ├── 00-prd/            # SDD pipeline: product requirements
+│   ├── 00-tasks/          # SDD pipeline: task graph
+│   ├── 00-techspec/       # SDD pipeline: technical design
+│   └── <vendored>/        # Third-party skills (provenance in skills-lock.json)
 ├── harnesses/             # Per-harness config owned by this repo
 │   └── opencode/
 │       ├── opencode.jsonc
