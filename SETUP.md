@@ -69,6 +69,9 @@ Estas libs trazem binário + artefatos de integração próprios. **Não** os cr
 | RTK | opencode | `rtk init -g --opencode` | `~/.config/opencode/plugins/rtk.ts` |
 | RTK | Claude Code | `rtk init -g` | `~/.claude/RTK.md` + `@RTK.md` no `CLAUDE.md` |
 | RTK | Codex | `rtk init -g --codex` | `~/.codex/RTK.md` + `@RTK.md` no `AGENTS.md` |
+| skills CLI (`npx skills`) | agnóstico | `npx skills add <owner/repo@skill> -g` | `~/.agents/.skill-lock.json` (estado local, não versionado) |
+
+O lock do skills CLI é estado local da máquina e **não** é versionado. A procedência canônica e versionada das skills fica em `skills-lock.json` na raiz do repo.
 
 ### RTK
 

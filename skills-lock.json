@@ -1,5 +1,6 @@
 {
   "version": 1,
+  "description": "Canonical, versioned provenance for the skills vendored in this repo. The skills CLI writes its own machine-local state to ~/.agents/.skill-lock.json, which is generated and not versioned.",
   "skills": {
     "agent-md-refactor": {
       "source": "softaworks/agent-toolkit",

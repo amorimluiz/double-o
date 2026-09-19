@@ -36,7 +36,7 @@ O repositório `double-o` é a **single source of truth** da minha configuraçã
 
 Quando eu pedir para instalar, criar ou editar algo global de agente (skill, rule, instrução, config de harness), **sempre opere primeiro dentro do repo `double-o`**:
 
-- **Skill:** instale/edite em `skills/<nome>/` no repo. Nunca instale direto na pasta global de skills da máquina. Depois registre/atualize `skills-lock.json`.
+- **Skill:** instale/edite em `skills/<nome>/` no repo. Nunca instale direto na pasta global de skills da máquina. Registre/atualize `skills-lock.json`, a procedência canônica e versionada. O `.skill-lock.json` que o CLI de skills gera em `~/.agents/` é estado local da máquina — **não** é versionado.
 - **Rule:** crie/edite em `rules/<tópico>.md` no repo.
 - **Instrução global:** edite `instructions/AGENTS.md` no repo.
 - **Config de harness:** edite em `harnesses/<harness>/` no repo.
