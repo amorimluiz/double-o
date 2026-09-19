@@ -1,6 +1,7 @@
 {
   "version": 1,
   "description": "Canonical, versioned provenance for the skills vendored in this repo. The skills CLI writes its own machine-local state to ~/.agents/.skill-lock.json, which is generated and not versioned.",
+  "hashAlgorithm": "sha256 over each file's relative path + content, files ordered by path (skills CLI computeSkillFolderHash)",
   "skills": {
     "agent-md-refactor": {
       "source": "softaworks/agent-toolkit",
@@ -18,13 +19,19 @@
       "source": "vercel-labs/skills",
       "sourceType": "github",
       "skillPath": "skills/find-skills/SKILL.md",
-      "computedHash": "b146008599c31057cef1c145774cea5d5afb30e8f43fa802e47a4b461419aaaf"
+      "computedHash": "913b9d37d0d54047dd65222bb8c67b2bf04e3cb87dcad1729068d7a8b2c8c396"
     },
     "folder-structure-blueprint-generator": {
       "source": "github/awesome-copilot",
       "sourceType": "github",
       "skillPath": "skills/folder-structure-blueprint-generator/SKILL.md",
       "computedHash": "418d532c42d0714986e90466e087f6fd8c975e7dc8afddafd1f37558968b639b"
+    },
+    "frontend-design": {
+      "source": "anthropics/skills",
+      "sourceType": "github",
+      "skillPath": "skills/frontend-design/SKILL.md",
+      "computedHash": "106acf230014cbb43ca34e6410371321b56ca742f9ee0442e8ec05bf02eb0384"
     },
     "writing-for-agents": {
       "source": "mattpocock/skills",
