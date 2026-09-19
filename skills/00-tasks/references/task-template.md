@@ -31,6 +31,10 @@ commit: "[type(scope): imperative subject]"
 - `path/to/file` — [brief reason this file is relevant]
 - `path/to/file` — [brief reason this file is affected]
 
+## Shared Dependencies
+
+[Stateful shared dependencies this task reads or mutates — database, cache, broker, object store, search — with the service name and the mutation (migration, seed, destructive test). State "None" when the task touches no shared stateful dependency. `00-loop` uses this to isolate the dependency per worktree.]
+
 ## Subtasks
 
 - [ ] NN.1 [What to accomplish]

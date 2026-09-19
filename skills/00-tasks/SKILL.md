@@ -19,7 +19,7 @@ Produce `.sdd/<slug>/tasks.md` and its `task-NN.md` files: the execution graph c
 Update `.sdd/<slug>/state.yml`; full schema in the sibling skill `00-loop` (`references/state-schema.md`). This skill owns:
 
 - On start: `step: tasks`, `updated_at`.
-- On completion: `artifacts.tasks: done`, `tasks.total`, `tasks.pending`, `step: execute`, `updated_at`.
+- On completion: `artifacts.tasks: done`, `tasks.total`, `tasks.pending`, `step: workspace`, `updated_at`.
 - On a real blocker: `step: blocked`, append the blocker.
 
 ## Decomposition Rules
@@ -29,6 +29,7 @@ Update `.sdd/<slug>/state.yml`; full schema in the sibling skill `00-loop` (`ref
 3. Size by risk and ownership. A default of three to seven tasks guides the cut and never caps it; file count does not decide it.
 4. Assign every behavior to exactly one owning task. Do not defer an explicit acceptance requirement to another task.
 5. Every task carries its own test assignments — the project's TDD rule applies per task, never to a later phase.
+6. Flag stateful shared dependencies. When a task touches a database, cache, broker, object store, or search cluster — especially when it mutates one through a migration, seed, fixture, or destructive test — record it in the task's Shared Dependencies section. The `00-loop` Workspace Gate uses these notes to isolate the dependency per worktree; a missed flag is a cross-run collision waiting to happen.
 
 ## Task File Rules
 
