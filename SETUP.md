@@ -60,16 +60,17 @@ New-Item -ItemType Junction -Path "<destino>" -Target "<REPO>\<origem>"
 ln -s "<REPO>/<origem>" "<destino>"
 ```
 
-## Parte 2 — Libs externas (instaladas pela própria lib)
+## Parte 2 — Ferramentas externas (instaladas pela própria ferramenta)
 
-Estas libs trazem binário + artefatos de integração próprios. **Não** os crie nem os versione no repo: rode o instalador da lib para o harness em uso. O repo apenas **referencia** o artefato resultante (ex.: `@RTK.md` em `instructions/AGENTS.md`), de modo que atualizar a lib atualiza o artefato automaticamente.
+Estas ferramentas trazem binário e artefatos próprios. **Não** os crie nem os versione no repo: rode o instalador da ferramenta; o repo apenas **referencia** o resultado (ex.: `@RTK.md` em `instructions/AGENTS.md`). Esta tabela é o rastreio canônico das ferramentas dos agentes: cada linha diz **para que skill ou harness** a ferramenta é necessária — sem ela, a skill correspondente quebra.
 
-| Lib | Harness | Instalação | Artefato gerado |
+| Ferramenta | Necessária para | Instalação | Verificação |
 | --- | --- | --- | --- |
-| RTK | opencode | `rtk init -g --opencode` | `~/.config/opencode/plugins/rtk.ts` |
-| RTK | Claude Code | `rtk init -g` | `~/.claude/RTK.md` + `@RTK.md` no `CLAUDE.md` |
-| RTK | Codex | `rtk init -g --codex` | `~/.codex/RTK.md` + `@RTK.md` no `AGENTS.md` |
-| skills CLI (`npx skills`) | agnóstico | `npx skills add <owner/repo@skill> -g` | `~/.agents/.skill-lock.json` (estado local, não versionado) |
+| RTK | integração de harness (opencode, Claude Code, Codex) | ver [RTK](#rtk) | `rtk --version` e `rtk init --show` |
+| skills CLI (`npx skills`) | instalar e atualizar skills | sem install; use `npx skills` | `npx skills --version` |
+| ctx7 | skill `context7` | `npm i -g ctx7@latest` | `ctx7 --version` |
+| agent-browser | skills `agent-browser` e `qa-execution` | `npm i -g agent-browser && agent-browser install` | `agent-browser --version` |
+| Python 3 | scripts auxiliares de `deep-review` e `qa-report` | `winget install Python.Python.3.13` (Windows) ou o gerenciador do sistema (Unix) | `python3 --version` (Windows: `python --version`) |
 
 O lock do skills CLI é estado local da máquina e **não** é versionado. A procedência canônica e versionada das skills fica em `skills-lock.json` na raiz do repo.
 
@@ -83,6 +84,16 @@ O lock do skills CLI é estado local da máquina e **não** é versionado. A pro
    Se `rtk gain` falhar mas `rtk --version` funcionar, você instalou o pacote errado (Rust Type Kit).
 2. Rode o instalador do harness em uso, conforme a tabela acima. O plugin/hook se desativa sozinho se o binário não existir (sem erro).
 3. No opencode, a integração é via plugin: **não há `RTK.md`** e o `@RTK.md` do `AGENTS.md` é inerte (opencode não expande referências `@arquivo`). Nos harnesses prompt-level (Claude Code, Codex), o instalador cria o `RTK.md` ao lado das instruções globais, e a referência `@RTK.md` resolve para ele.
+
+### Ferramentas npm (ctx7, agent-browser)
+
+1. Instale globalmente: `npm i -g ctx7@latest agent-browser`.
+2. `agent-browser install` baixa o Chrome dedicado (~200 MB) para `~/.agent-browser/browsers/`. O npm pode bloquear o postinstall da lib (política `allow-scripts`); o `agent-browser install` explícito resolve — não é preciso liberar o script de instalação.
+3. O `ctx7` funciona sem autenticação; `ctx7 login` (OAuth) ou `CONTEXT7_API_KEY` elevam o limite de uso.
+
+### Python
+
+`deep-review` e `qa-report` rodam scripts Python auxiliares; sem o interpretador, essas skills operam parcialmente. No Windows, `winget install Python.Python.3.13` instala por usuário e entra no PATH — abra um terminal novo depois.
 
 ### Dependências do plugin (opencode)
 
@@ -103,6 +114,7 @@ Para cada link criado:
 3. O harness inicia sem erro e enxerga os artefatos:
    - opencode: `/init` não deve recriar `AGENTS.md`; skills aparecem na lista de skills disponíveis.
 4. Para libs: `rtk init --show` lista a integração do harness como instalada.
+5. Ferramentas externas: rode os comandos de verificação da tabela da Parte 2. Um comando que falha indica uma skill quebrada naquela máquina.
 
 ## Se algo der errado
 
