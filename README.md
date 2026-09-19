@@ -24,6 +24,10 @@ double-o/
 │   └── AGENTS.md          # Global governance (not auto-loaded from here)
 ├── rules/                 # Engineering standards, one topic per file
 ├── skills/                # Canonical skills, one folder per skill
+│   ├── 00-loop/            # SDD pipeline: entry point + execution loop
+│   ├── 00-prd/             # SDD pipeline: product requirements
+│   ├── 00-tasks/           # SDD pipeline: task graph
+│   ├── 00-techspec/        # SDD pipeline: technical design
 │   ├── agent-md-refactor/
 │   ├── create-readme/
 │   ├── find-skills/
@@ -53,7 +57,7 @@ On a new machine, hand [`SETUP.md`](SETUP.md) to your agent. It detects the inst
 
 ## Managing skills
 
-Skills are fetched with the [Skills CLI](https://skills.sh) and kept in `skills/` as the canonical source.
+The `00-*` skills (the SDD pipeline) are authored in this repo. The rest are fetched with the [Skills CLI](https://skills.sh) and kept in `skills/` as the canonical source.
 
 ```bash
 npx skills find <query>                                  # search
