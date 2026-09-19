@@ -32,7 +32,7 @@ Update `.sdd/<slug>/state.yml` at every completed step; full schema in the sibli
 
 1. Gather context: read `prd.md` and the current `techspec.md` when present (update mode: preserve approved sections). Explore the codebase through the runtime's subagent tool when available: architecture patterns, existing components, dependencies, and the technology stack.
 2. Grill the design: walk the decision tree branch by branch — architecture and component boundaries, data models and storage, API design and integration points, testing strategy, performance. Use the same question mechanics as `00-prd/references/question-protocol.md`; never spend a question on what the codebase can answer.
-3. Write `techspec.md` using `references/techspec-template.md`; fill every applicable section and note the reason for omissions. Map every PRD goal and user story to a technical component, referencing PRD sections by name instead of restating business context.
+3. Write `techspec.md` using `references/techspec-template.md`; fill every applicable section and note the reason for omissions. Map every PRD goal and user story to a technical component, referencing PRD sections by name instead of restating business context. When the architecture or a flow reads better as a diagram, use the `mermaid-diagrams` skill and inline the Mermaid block.
 4. Hand off: report the file path and ask for approval. On approval, point to `00-tasks` — or continue the `00-loop` pipeline when it invoked this skill.
 
 ## Design Minimalism
