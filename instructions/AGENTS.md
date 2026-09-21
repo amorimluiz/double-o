@@ -43,7 +43,7 @@ Quando eu pedir para instalar, criar ou editar algo global de agente (skill, rul
 - **Rule:** crie/edite em `rules/<tópico>.md` no repo.
 - **Instrução global:** edite `instructions/AGENTS.md` no repo.
 - **Config de harness:** edite em `harnesses/<harness>/` no repo.
-- **MCP:** é **local à máquina** e **não** entra no repo nem em symlink — o launch spec embute caminho absoluto do app (e, às vezes, endpoint efêmero). Cada ferramenta gera o próprio spec no arquivo global do harness (ex.: OpenDesign → `~/.config/opencode/opencode.json`); o `SETUP.md` documenta o passo. O repo mantém só a config portável do harness.
+- **MCP:** é **local à máquina** e **não** entra no repo nem em symlink — o launch spec embute caminho absoluto do app (e, às vezes, endpoint efêmero). Cada ferramenta gera o próprio spec no arquivo global do harness (ex.: OpenDesign → `~/.config/opencode/opencode.json` no opencode e `claude mcp add … --scope user` no Claude Code); o `SETUP.md` documenta o passo. O repo mantém só a config portável do harness.
 
 O symlink já existente torna a mudança disponível na máquina na hora; o `git pull` propaga para as outras. Se o symlink ainda não existir na máquina, siga o `SETUP.md`. Nunca duplique conteúdo: o repo é a única cópia canônica.
 
@@ -51,8 +51,8 @@ O symlink já existente torna a mudança disponível na máquina na hora; o `git
 
 O caminho do repo muda por máquina e **não é versionado**. Descubra-o resolvendo o alvo do symlink deste arquivo, que é sempre `<repo>/instructions/AGENTS.md`:
 
-- Windows: `(Get-Item "$env:USERPROFILE\.config\opencode\AGENTS.md").Target`
-- Unix: `realpath ~/.config/opencode/AGENTS.md`
+- Windows: `(Get-Item "$env:USERPROFILE\.config\opencode\AGENTS.md").Target` ou `(Get-Item "$env:USERPROFILE\.claude\CLAUDE.md").Target`
+- Unix: `realpath ~/.config/opencode/AGENTS.md` ou `realpath ~/.claude/CLAUDE.md`
 
 O repo é o diretório pai de `instructions/`. Se este arquivo não for um symlink, a máquina ainda não foi configurada: siga o `SETUP.md`, usando o caminho do clone como `REPO`. Nunca grave caminho absoluto dentro do repo.
 

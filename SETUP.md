@@ -26,9 +26,12 @@ Crie cada link abaixo. A coluna "Harness" indica quando ele se aplica — pule h
 | opencode | `rules/` | `~/.config/opencode/rules/` | diretório |
 | opencode | `harnesses/opencode/opencode.jsonc` | `~/.config/opencode/opencode.jsonc` | arquivo |
 | opencode | `harnesses/opencode/package.json` | `~/.config/opencode/package.json` | arquivo |
+| claude | `instructions/AGENTS.md` | `~/.claude/CLAUDE.md` | arquivo |
+| claude | `rules/` | `~/.claude/rules/` | diretório |
+| claude | `skills/` | `~/.claude/skills/` | diretório |
 | agnóstico | `skills/` | `~/.agents/skills/` | diretório |
 
-`~/.agents/skills/` é a convenção agnóstica de harness (lida por opencode, Codex e outros). Skills globais vão para lá, não para o diretório de um harness específico.
+`~/.agents/skills/` é a convenção agnóstica de harness (lida por opencode, Codex e outros). Skills globais vão para lá, não para o diretório de um harness específico. Claude Code, porém, lê apenas `~/.claude/skills/` — por isso a linha extra apontando o mesmo `skills/` para ele.
 
 **MCPs são locais à máquina — não entram no repo.** O launch spec de um MCP contém caminho absoluto do app e, às vezes, um endpoint efêmero. Versionar isso faria o `git pull` sobrescrever o spec correto de uma máquina com o de outra. Por isso o MCP não é versionado nem symlinkado: cada ferramenta gera o próprio spec no arquivo global do harness (ver [OpenDesign](#opendesign)). No opencode, `opencode.json` e `opencode.jsonc` do diretório global são mesclados — a config portável continua vindo do repo (`harnesses/opencode/opencode.jsonc` → `~/.config/opencode/opencode.jsonc`) e só o MCP fica no arquivo local.
 
@@ -38,6 +41,7 @@ Para cada linha do mapa cujo harness está instalado:
 
 1. **Detecte o harness.** Se o diretório global do harness existe, ele está instalado.
    - opencode: `~/.config/opencode/` existe ou o comando `opencode` está no PATH.
+   - claude: `~/.claude/` existe ou o comando `claude` está no PATH.
 2. **Faça backup do que já existe.** Se o destino existir e não for um symlink para `REPO`, mova-o para `<destino>.bak-<data>` antes de continuar.
 3. **Crie o diretório pai** do destino, se necessário.
 4. **Crie o link.**
@@ -74,7 +78,7 @@ Estas ferramentas trazem binário e artefatos próprios. **Não** os crie nem os
 | ctx7 | skill `context7` | `npm i -g ctx7@latest` | `ctx7 --version` |
 | agent-browser | skills `agent-browser` e `qa-execution` | `npm i -g agent-browser && agent-browser install` | `agent-browser --version` |
 | herdr | skills `herdr` e `herdr-orchestration` | ver [herdr](#herdr) | `herdr --version` e `herdr integration status` |
-| OpenDesign (app desktop) | skill `00-design` e MCP `open-design` no opencode | ver [OpenDesign](#opendesign) | app instalado e MCP listado no opencode |
+| OpenDesign | skill `00-design` e MCP `open-design` (opencode e Claude Code) | ver [OpenDesign](#opendesign) | daemon de pé (`curl http://127.0.0.1:7456/api/health`) e MCP `connected` no harness |
 
 O lock do skills CLI é estado local da máquina e **não** é versionado. A procedência canônica e versionada das skills fica em `skills-lock.json` na raiz do repo.
 
@@ -97,14 +101,40 @@ O lock do skills CLI é estado local da máquina e **não** é versionado. A pro
 
 ### OpenDesign
 
-App desktop local-first que expõe um servidor **MCP stdio** com os projetos/arquivos de design.
+App local-first que expõe um servidor **MCP stdio** com os projetos/arquivos de design. O MCP é sempre stdio e faz proxy para a API HTTP do daemon; o host precisa de um jeito de executar o CLI `od` (ou o `cli.js` equivalente) **e** do daemon de pé.
 
-1. **Instale o app desktop** em [open-design.ai](https://open-design.ai/) ou [GitHub Releases](https://github.com/nexu-io/open-design/releases) (macOS e Windows; no Linux, só a partir do fonte). Abra-o uma vez.
-2. **Gere o spec do MCP.** No app, abra **Settings → MCP server**, selecione **OpenCode** e copie o snippet. Ele já vem com os caminhos absolutos e o endpoint do sidecar desta máquina. O app empacotado no Windows **não** traz o comando `od` no PATH ([nexu-io/open-design#4852](https://github.com/nexu-io/open-design/issues/4852)) — se o snippet citar `"command": "od"`, está desatualizado; use o que aponta para o executável do app.
-3. **Salve em `~/.config/opencode/opencode.json`**, no schema do opencode: chave `mcp`, `type: "local"`, `command` como array (executável + args) e `environment`. Esse arquivo é **local à máquina** — não versione nem symlinke; o `.jsonc` do repo é a parte portável.
-4. **Reinicie o opencode.** O servidor aparece como `open-design`.
+**macOS / Windows — app desktop**
 
-O app precisa estar aberto para as chamadas funcionarem (se estiver parado, o MCP tenta subir uma instância headless). Ao reinstalar ou atualizar o app, o endpoint do sidecar muda: **regenere o snippet** (passo 2).
+1. **Instale o app desktop** em [open-design.ai](https://open-design.ai/) ou [GitHub Releases](https://github.com/nexu-io/open-design/releases). Abra-o uma vez.
+2. **Gere o spec do MCP.** Em **Settings → MCP server**, selecione o harness (**OpenCode** / **Claude Code**) e copie o snippet. Ele já traz os caminhos absolutos e o endpoint do sidecar desta máquina. O app empacotado no Windows **não** põe o comando `od` no PATH ([nexu-io/open-design#4852](https://github.com/nexu-io/open-design/issues/4852)) — se o snippet citar `"command": "od"`, use o que aponta para o executável do app.
+3. Salve no arquivo global do harness (OpenCode: `~/.config/opencode/opencode.json`, chave `mcp`, `type: "local"`; Claude Code: `claude mcp add-json … --scope user`). Specs de MCP são **locais à máquina** — não versione nem symlinke.
+4. Reinicie o harness; o servidor aparece como `open-design`.
+5. O app precisa estar aberto (parado, o MCP tenta subir uma instância headless). Ao reinstalar/atualizar, o endpoint do sidecar muda: **regenere o snippet**.
+
+**Linux — daemon via Docker (não há artefato pré-buildado)**
+
+O release oficial só publica macOS/Windows ([#4368](https://github.com/nexu-io/open-design/issues/4368)); o build do fonte exige Node 24 e um monorepo de ~3 GB. O caminho leve é rodar o daemon da imagem oficial e registrar o MCP via `docker exec`.
+
+1. Docker + Compose instalados. Crie `~/.config/open-design/` com:
+   - `.env` (local, não versionado): `OD_API_TOKEN=$(openssl rand -hex 32)` e `OPEN_DESIGN_PORT=7456`.
+   - `docker-compose.yml`: serviço único com a imagem `ghcr.io/nexu-io/od:latest`, `ports: ["127.0.0.1:7456:7456"]`, volume `open_design_data:/app/.od`, `restart: always`. Base: [`deploy/docker-compose.yml`](https://github.com/nexu-io/open-design/blob/main/deploy/docker-compose.yml) — remova o `build:` e suba com `--no-build`.
+2. Suba e valide: `docker compose up -d --no-build` → `curl -fsS http://127.0.0.1:7456/api/health`.
+3. Registre o MCP. Dentro da imagem o CLI é `/app/apps/daemon/dist/cli.js` (o `od` do PATH da imagem é o BusyBox `od`), então o harness executa o MCP via `docker exec`:
+   - OpenCode (`~/.config/opencode/opencode.json`):
+     ```json
+     "open-design": {
+       "type": "local",
+       "command": ["docker","exec","-i","open-design","node","/app/apps/daemon/dist/cli.js","mcp","--daemon-url","http://127.0.0.1:7456"],
+       "enabled": true
+     }
+     ```
+   - Claude Code:
+     ```bash
+     claude mcp add-json open-design '{"type":"stdio","command":"docker","args":["exec","-i","open-design","node","/app/apps/daemon/dist/cli.js","mcp","--daemon-url","http://127.0.0.1:7456"]}' --scope user
+     ```
+4. O `--daemon-url` é obrigatório: a descoberta automática via sidecar não existe no formato Docker. O daemon precisa estar de pé (o MCP faz proxy para `127.0.0.1:7456`); `restart: always` o mantém após reboot. Ao atualizar a imagem (`docker compose pull`), o MCP segue válido.
+
+Ferramentas expostas: `create_project`, `start_run`, `get_run`, `get_artifact`, `list_skills`, `list_plugins` e os resources `od://design-systems/<id>/DESIGN.md` / `od://skills/<id>/SKILL.md`.
 
 ### herdr
 

@@ -94,8 +94,8 @@ Deleting a committed secret does not remove it: history, clones, and forks keep 
 ## Provenance and AI
 
 - The human is the author and is accountable for every change, including generated code.
-- Disclose material AI assistance with an `Assisted-by: <tool>` trailer. Do not use `Co-authored-by` for a tool: it denotes human authorship.
-- Never attribute authorship or sign-off to an AI.
+- Disclose material AI assistance with the trailer the agent harness mandates. The opencode harness requires `Co-authored-by: <tool> <email>` (e.g. `Co-authored-by: Claude <noreply@anthropic.com>`), separated from the body by a blank line and placed at the very end of the commit message. When the harness mandates nothing, fall back to `Assisted-by: <tool>`.
+- Never attribute sign-off to an AI.
 - Never let a tool answer reviewers; the author explains and defends the change.
 - Commit signing is not required. Use `Signed-off-by` only where the project requires a DCO.
 
