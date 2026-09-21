@@ -14,7 +14,7 @@ O repositório gerencia apenas o que é **dele**: instruções, rules, skills e 
    - Ex.: `C:\Users\<voce>\projects\double-o` (Windows) ou `~/projects/double-o` (Unix).
    - `REPO` é uma entrada do setup, **não** um dado versionado: o repo não guarda caminho absoluto. A fonte do caminho é o próprio clone — este `SETUP.md` fica na raiz dele.
 2. Confirme que o caminho é estável. Symlinks quebram se o repositório for movido.
-3. Node.js e Python 3 são pré-requisitos para as skills funcionarem: Node.js (npm/npx) para as CLIs instaladas via npm e Python 3 para os scripts auxiliares de `deep-review` e `qa-report`. Confirme com `node --version` e `python3 --version` (Windows: `python --version`; instale com `winget install Python.Python.3.13`).
+3. Node.js e Python 3 são pré-requisitos para as skills funcionarem: Node.js (npm/npx) para as CLIs instaladas via npm e Python 3 para os scripts auxiliares de `deep-review`, `qa-report` e `ui-ux-pro-max`. Confirme com `node --version` e `python3 --version` (Windows: `python --version`; instale com `winget install Python.Python.3.13`).
 
 ## Parte 1 — Artefatos do repositório (symlinks)
 
@@ -29,6 +29,8 @@ Crie cada link abaixo. A coluna "Harness" indica quando ele se aplica — pule h
 | agnóstico | `skills/` | `~/.agents/skills/` | diretório |
 
 `~/.agents/skills/` é a convenção agnóstica de harness (lida por opencode, Codex e outros). Skills globais vão para lá, não para o diretório de um harness específico.
+
+**MCPs são locais à máquina — não entram no repo.** O launch spec de um MCP contém caminho absoluto do app e, às vezes, um endpoint efêmero. Versionar isso faria o `git pull` sobrescrever o spec correto de uma máquina com o de outra. Por isso o MCP não é versionado nem symlinkado: cada ferramenta gera o próprio spec no arquivo global do harness (ver [OpenDesign](#opendesign)). No opencode, `opencode.json` e `opencode.jsonc` do diretório global são mesclados — a config portável continua vindo do repo (`harnesses/opencode/opencode.jsonc` → `~/.config/opencode/opencode.jsonc`) e só o MCP fica no arquivo local.
 
 ### Procedimento
 
@@ -71,6 +73,8 @@ Estas ferramentas trazem binário e artefatos próprios. **Não** os crie nem os
 | skills CLI (`npx skills`) | instalar e atualizar skills | sem install; use `npx skills` | `npx skills --version` |
 | ctx7 | skill `context7` | `npm i -g ctx7@latest` | `ctx7 --version` |
 | agent-browser | skills `agent-browser` e `qa-execution` | `npm i -g agent-browser && agent-browser install` | `agent-browser --version` |
+| herdr | skills `herdr` e `herdr-orchestration` | ver [herdr](#herdr) | `herdr --version` e `herdr integration status` |
+| OpenDesign (app desktop) | skill `00-design` e MCP `open-design` no opencode | ver [OpenDesign](#opendesign) | app instalado e MCP listado no opencode |
 
 O lock do skills CLI é estado local da máquina e **não** é versionado. A procedência canônica e versionada das skills fica em `skills-lock.json` na raiz do repo.
 
@@ -90,6 +94,27 @@ O lock do skills CLI é estado local da máquina e **não** é versionado. A pro
 1. Instale globalmente: `npm i -g ctx7@latest agent-browser`.
 2. `agent-browser install` baixa o Chrome dedicado (~200 MB) para `~/.agent-browser/browsers/`. O npm pode bloquear o postinstall da lib (política `allow-scripts`); o `agent-browser install` explícito resolve — não é preciso liberar o script de instalação.
 3. O `ctx7` funciona sem autenticação; `ctx7 login` (OAuth) ou `CONTEXT7_API_KEY` elevam o limite de uso.
+
+### OpenDesign
+
+App desktop local-first que expõe um servidor **MCP stdio** com os projetos/arquivos de design.
+
+1. **Instale o app desktop** em [open-design.ai](https://open-design.ai/) ou [GitHub Releases](https://github.com/nexu-io/open-design/releases) (macOS e Windows; no Linux, só a partir do fonte). Abra-o uma vez.
+2. **Gere o spec do MCP.** No app, abra **Settings → MCP server**, selecione **OpenCode** e copie o snippet. Ele já vem com os caminhos absolutos e o endpoint do sidecar desta máquina. O app empacotado no Windows **não** traz o comando `od` no PATH ([nexu-io/open-design#4852](https://github.com/nexu-io/open-design/issues/4852)) — se o snippet citar `"command": "od"`, está desatualizado; use o que aponta para o executável do app.
+3. **Salve em `~/.config/opencode/opencode.json`**, no schema do opencode: chave `mcp`, `type: "local"`, `command` como array (executável + args) e `environment`. Esse arquivo é **local à máquina** — não versione nem symlinke; o `.jsonc` do repo é a parte portável.
+4. **Reinicie o opencode.** O servidor aparece como `open-design`.
+
+O app precisa estar aberto para as chamadas funcionarem (se estiver parado, o MCP tenta subir uma instância headless). Ao reinstalar ou atualizar o app, o endpoint do sidecar muda: **regenere o snippet** (passo 2).
+
+### herdr
+
+Gerenciador de workspace de terminal para agentes, com servidor persistente e CLI sobre socket API. É o substrato que as skills `herdr` e `herdr-orchestration` controlam.
+
+1. **Instale o binário.** Linux/macOS: `curl -fsSL https://herdr.dev/install.sh | sh`. Windows (PowerShell): `powershell -ExecutionPolicy Bypass -c "irm https://herdr.dev/install.ps1 | iex"`. Confirme com `herdr --version`.
+2. **Instale a integração do harness em uso** para que o herdr reconheça o estado dos agentes: `herdr integration install opencode` (há alvos para claude, codex, cursor, entre outros). Confirme com `herdr integration status` — o harness em uso deve aparecer como `current`.
+3. **As skills vêm do repo**, não do instalador: `herdr` e `herdr-orchestration` já chegam via symlink de `skills/`. Use `npx skills update` apenas para atualizá-las.
+
+A integração escreve um plugin gerado (ex.: `~/.config/opencode/plugins/herdr-agent-state.js`) — artefato local à máquina, não versionado. A skill canônica também sai de `herdr --skill`; a cópia versionada em `skills/herdr/` é a mesma.
 
 ### Dependências do plugin (opencode)
 
@@ -111,6 +136,7 @@ Para cada link criado:
    - opencode: `/init` não deve recriar `AGENTS.md`; skills aparecem na lista de skills disponíveis.
 4. Para libs: `rtk init --show` lista a integração do harness como instalada.
 5. Ferramentas externas: rode os comandos de verificação da tabela da Parte 2 e os pré-requisitos da seção anterior. Um comando que falha indica uma skill quebrada naquela máquina.
+6. MCP (OpenDesign): com o app aberto, o servidor `open-design` aparece no opencode (ex.: `opencode mcp list`).
 
 ## Se algo der errado
 

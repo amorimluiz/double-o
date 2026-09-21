@@ -18,6 +18,11 @@ node_modules/
 __pycache__/
 *.pyc
 
+# Coverage artifacts (vendored skill test runs)
+.coverage
+.coverage.*
+coverage-ui.json
+
 # SDD pipeline workspace (local by design)
 .sdd/
 
