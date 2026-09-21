@@ -1,0 +1,58 @@
+---
+name: 00-design
+description: Generate the user-interface prototypes for a feature — grill the interface, commission OpenDesign with the PRD, TechSpec, and DESIGN.md injected as context, and write self-contained interactive HTML prototypes to .sdd/<slug>/design/ behind an approval gate. Use when a TechSpec exists and the feature has a user-facing interface, or when the 00-loop SDD pipeline reaches its Design step. Do not use for PRD, technical design, task breakdown, or implementation.
+---
+
+# Create Interface Prototypes
+
+Produce `.sdd/<slug>/design/`: self-contained interactive HTML prototypes, one per screen, that pin the interface before any production code exists. This is the interface contract `00-tasks` decomposes and the execution loop implements against.
+
+<HARD-GATE>
+- Applicability first: a feature with no user-facing surface records a skip and returns to the pipeline. Never fabricate prototypes for internal-only work.
+- Explore before asking: read the PRD, TechSpec, existing screens, `DESIGN.md`, and the `ui-ux-pro-max` design system before spending a question.
+- Questions before generating: the user shapes the interface by answering interface questions, one at a time. Use the mechanics in `00-prd/references/question-protocol.md`.
+- Approval before advancing: prototypes are a gate. Apply requested adjustments and re-gate; advance only on explicit approval.
+</HARD-GATE>
+
+## Workspace
+
+- Directory: `.sdd/<slug>/design/` (same slug as the PRD).
+- Read first: `techspec.md` (primary), `prd.md`, and `DESIGN.md` at the repo root. When the TechSpec is missing, stop and point to `00-techspec`.
+- `DESIGN.md` absent: author it at the repo root in the Google Labs format before generating; seed its tokens from the `ui-ux-pro-max` design-system output, then follow `references/opendesign-integration.md`.
+- Artifacts: `design/NN-<screen>.html` plus `design/index.html` (links the screens); the OpenDesign source files alongside them.
+- Language: reuse the language recorded in `state.yml`.
+
+## State
+
+Update `.sdd/<slug>/state.yml`; full schema in the sibling skill `00-loop` (`references/state-schema.md`). This skill owns:
+
+- On start: `step: design`, `updated_at`.
+- On completion: `artifacts.design: done`, `step: tasks`, `updated_at`.
+- On non-UI skip: `artifacts.design: skipped`, `step: tasks`, `updated_at`, with the reason in `next`.
+- On a real blocker: `step: blocked`, append the blocker.
+
+## Workflow
+
+1. Applicability: decide from the PRD and TechSpec whether the feature exposes a surface a user sees — a screen, view, dialog, or TUI/CLI affordance. No such surface: record the skip and hand off to `00-tasks`. Otherwise continue.
+2. Explore before asking: the existing screens, components, and tokens in the codebase; the design system in `DESIGN.md` plus any OpenDesign design system (`od://design-systems/<id>/DESIGN.md`); and one `ui-ux-pro-max` design-system query for the product type (`references/design-intelligence.md`). Present the merged findings, 3-5 bullets.
+3. Grill the interface: read `references/interface-grilling.md` and walk its decision tree branch by branch, one question at a time, until every load-bearing interface decision is confirmed or parked with the user's consent.
+4. Generate: commission OpenDesign per `references/opendesign-integration.md` — compose the brief from the approved answers plus PRD, TechSpec, and `DESIGN.md`, start the run, poll it, and persist the returned prototypes into `design/`. Let the run finish; never hand-write files in place of a run that is still in flight.
+5. Gate: report the prototype paths and the screen inventory, then ask for approval through the interactive question tool. On requested adjustments, refine through OpenDesign and re-gate. On approval, set state and hand off to `00-tasks` — or continue the `00-loop` pipeline when it invoked this skill.
+
+## Prototype Standard
+
+The definition of done for `design/`. Every prototype:
+
+- One self-contained HTML file per screen — inline CSS/JS, no network, no build step — that opens directly in a browser.
+- Covers its real states per screen: loading, empty, error, and success, plus narrow and wide viewports.
+- Reads its colors, spacing, type, and components from `DESIGN.md` and the existing design system; invents none.
+- Meets the accessibility bar in `rules/frontend.md` at prototype fidelity: semantic structure, keyboard order, visible focus, contrast, and accessible names.
+- Uses real copy and realistic data; no placeholder text, dead links, or TODO markup.
+
+## Error Handling
+
+- TechSpec missing: stop; point to `00-techspec`.
+- No user-facing surface: record the skip and advance to `tasks`; do not spend interface questions.
+- `DESIGN.md` absent: create it at the repo root, then generate against it.
+- OpenDesign unavailable (MCP disconnected or app not running): record the blocker and report the fix from `SETUP.md`; write prototypes as local HTML only on explicit instruction.
+- Run fails with `failureAction: recharge`: show the recharge URL, and after the user confirms the top-up resume the same run with its original request id.

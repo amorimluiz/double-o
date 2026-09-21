@@ -1,6 +1,6 @@
 ---
 name: 00-loop
-description: Run the full spec-driven development loop for a feature — generate PRD, TechSpec, and tasks behind approval gates, choose an isolated worktree workspace with per-worktree dependency isolation, execute tasks one per iteration with TDD, verification, and atomic commits, then run the applicable QA steps and a deep review, resuming from state.yml. Use when the user asks to build a feature end-to-end from a prompt, or to resume or continue an SDD run. Do not use for one-off edits or single tasks without a spec.
+description: Run the full spec-driven development loop for a feature — generate PRD, TechSpec, interface prototypes, and tasks behind approval gates, choose an isolated worktree workspace with per-worktree dependency isolation, execute tasks one per iteration with TDD, verification, and atomic commits, then run the applicable QA steps and a deep review, resuming from state.yml. Use when the user asks to build a feature end-to-end from a prompt, or to resume or continue an SDD run. Do not use for one-off edits or single tasks without a spec.
 ---
 
 # Agentic SDD Loop
@@ -16,7 +16,7 @@ Entry point for the spec-driven pipeline. One prompt describes the goal; this sk
 ## Bootstrap
 
 1. Resolve the repo root and the slug (kebab-case, from the prompt or the user). Ask once when ambiguous.
-2. Directory: `.sdd/<slug>/`. Create it when missing; artifacts are `prd.md`, `techspec.md`, `tasks.md`, `task-NN.md`, `state.yml`. QA and review outputs live where their skills define them.
+2. Directory: `.sdd/<slug>/`. Create it when missing; artifacts are `prd.md`, `techspec.md`, `design/`, `tasks.md`, `task-NN.md`, `state.yml`. QA and review outputs live where their skills define them.
 3. Ensure `.sdd/` and `.worktrees/` are ignored: add both entries to the project's `.gitignore` (create the file when missing) unless already covered. Specs and worktrees are local by design.
 4. `state.yml`: create from `references/state-schema.md` with `slug`, `goal`, `language`, `step`, `created_at`. When the file already exists, resume instead of resetting.
 
@@ -28,6 +28,7 @@ Read `state.yml` first, then route by `step`:
 | --- | --- |
 | `prd` | Activate the `00-prd` skill; on its completion, gate. |
 | `techspec` | Activate the `00-techspec` skill; on its completion, gate. |
+| `design` | Activate the `00-design` skill; on its completion, gate. |
 | `tasks` | Activate the `00-tasks` skill; on its completion, gate. |
 | `workspace` | Run the Workspace Gate below. It decides the execution workspace and provisions dependency isolation, then sets `step: execute`. |
 | `execute` | Run the Execution Loop below. |
@@ -38,6 +39,7 @@ Read `state.yml` first, then route by `step`:
 | `done` | Report the closed run; ask before re-opening. |
 
 - Skip a step whose artifact is `done` or `skipped`; jump straight to the next pending one. The `workspace` step is a decision, not an artifact: skip it once `workspace.mode` is recorded.
+- Design applicability: the `design` step runs only when the feature exposes a surface a user sees. With no such surface, `00-design` sets `artifacts.design` to `skipped`, states the reason in `next`, and advances to `tasks` without prototypes.
 - QA applicability: after `execute`, the QA steps exist only when the delivered change touches an interface a user or caller exercises — UI, HTTP/UDS API, CLI, or SDK. With no such surface, set `artifacts.qa-report` and `artifacts.qa-execution` to `skipped`, state the reason in `next`, and jump to `review`.
 - Gate: report the artifact path, summarize the top decisions, ask for approval through the interactive question tool, and stop. On approval, advance `step` and continue the same turn.
 - A rejected artifact goes back to its skill (or to the fixes the user requested) before the step re-runs; never patch it silently. Code fixes the QA or review steps surface go through `execute`.

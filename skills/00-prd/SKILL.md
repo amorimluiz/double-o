@@ -17,7 +17,7 @@ Produce `.sdd/<slug>/prd.md`: the business-facing source of truth for WHAT users
 
 - Repo root: resolve once (the current project's git root).
 - Directory: `.sdd/<slug>/` — `<slug>` is kebab-case, derived from the feature name.
-- Artifacts: `prd.md` (this skill), `techspec.md`, `tasks.md`, `task-NN.md`, `state.yml`.
+- Artifacts: `prd.md` (this skill), `techspec.md`, `design/`, `tasks.md`, `task-NN.md`, `state.yml`.
 - Language: detect the project's artifact language from `AGENTS.md`, `CLAUDE.md`, or `README.md`; when unclear, ask once and record it. Default: English.
 
 ## State
