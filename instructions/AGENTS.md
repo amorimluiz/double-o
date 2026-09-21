@@ -29,6 +29,8 @@ Estas instruções são globais e valem para **qualquer projeto**, salvo quando 
 
 `rules/api-design.md` (ao lado deste arquivo) são as regras duras de design de API: contrato primeiro, evolução aditiva, erros RFC 9457, idempotência, paginação por cursor, versionamento `/v1` e interfaces para agentes. Leia antes de criar ou alterar qualquer interface pública (HTTP, RPC, GraphQL, biblioteca ou ferramenta de agente).
 
+`rules/frontend.md` (ao lado deste arquivo) são as regras duras de frontend/UI: acessibilidade (WCAG 2.2 AA), design system e tokens antes de inventar, componentes puros, Core Web Vitals como orçamento (LCP/INP/CLS), segurança de frontend (XSS/CSP), i18n e guardrails de UI por IA. Leia antes de escrever ou alterar qualquer interface de usuário.
+
 Novas regras entram em `rules/`, uma por tópico (`rules/observability.md`, …), sem inflar este arquivo.
 
 ## Fonte de verdade global (repo `double-o`)
@@ -41,6 +43,7 @@ Quando eu pedir para instalar, criar ou editar algo global de agente (skill, rul
 - **Rule:** crie/edite em `rules/<tópico>.md` no repo.
 - **Instrução global:** edite `instructions/AGENTS.md` no repo.
 - **Config de harness:** edite em `harnesses/<harness>/` no repo.
+- **MCP:** é **local à máquina** e **não** entra no repo nem em symlink — o launch spec embute caminho absoluto do app (e, às vezes, endpoint efêmero). Cada ferramenta gera o próprio spec no arquivo global do harness (ex.: OpenDesign → `~/.config/opencode/opencode.json`); o `SETUP.md` documenta o passo. O repo mantém só a config portável do harness.
 
 O symlink já existente torna a mudança disponível na máquina na hora; o `git pull` propaga para as outras. Se o symlink ainda não existir na máquina, siga o `SETUP.md`. Nunca duplique conteúdo: o repo é a única cópia canônica.
 

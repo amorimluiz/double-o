@@ -5,12 +5,12 @@ description: Decompose an approved TechSpec into a dependency-ordered task graph
 
 # Create Tasks
 
-Produce `.sdd/<slug>/tasks.md` and its `task-NN.md` files: the execution graph consumed by `00-loop`. Reuse the TechSpec's decisions and file references; a new task does not require starting research from zero.
+Produce `.sdd/<slug>/tasks.md` and its `task-NN.md` files: the execution graph consumed by `00-loop`. Reuse the TechSpec's decisions and file references; a new task does not require starting research from zero. When approved `design/` prototypes exist, the interface they fix is a contract — assign each screen or component to an owning task and reference the prototype file rather than re-deciding its layout or states.
 
 ## Workspace
 
 - Directory: `.sdd/<slug>/` (same slug as the PRD).
-- Read first: `techspec.md` and `prd.md`. When the TechSpec is missing, stop and point to `00-techspec`.
+- Read first: `techspec.md`, `prd.md`, and the approved `design/` prototypes when they exist. When the TechSpec is missing, stop and point to `00-techspec`.
 - Artifacts: `tasks.md` (graph and status table), `task-NN.md` (one per task), `state.yml`.
 - Language: reuse the language recorded in `state.yml`.
 

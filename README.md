@@ -26,8 +26,9 @@ double-o/
 ├── skills/                # Canonical skills, one folder per skill
 │   ├── 00-loop/           # SDD pipeline: entry point + execution loop
 │   ├── 00-prd/            # SDD pipeline: product requirements
-│   ├── 00-tasks/          # SDD pipeline: task graph
 │   ├── 00-techspec/       # SDD pipeline: technical design
+│   ├── 00-design/         # SDD pipeline: interface prototypes
+│   ├── 00-tasks/          # SDD pipeline: task graph
 │   └── <vendored>/        # Third-party skills (provenance in skills-lock.json)
 ├── harnesses/             # Per-harness config owned by this repo
 │   └── opencode/
@@ -74,4 +75,5 @@ After fetching, move the skill folder into `skills/` so it becomes part of the c
 - **Harness-agnostic.** Nothing here assumes a specific agent. Per-harness details are isolated under `harnesses/`.
 - **Single source of truth.** One canonical copy, symlinked into place. Changes propagate by `git pull`.
 - **No vendoring.** Only artifacts this repo owns are tracked. Libraries are installed by their own installers; the repo references their output, never copies it.
+- **Machine-local specs stay out.** Launch specs that embed absolute paths or ephemeral endpoints (e.g. MCP servers) are generated per machine and never versioned — see [SETUP.md](SETUP.md).
 - **No hidden context.** Auto-loaded paths stay out of the repo root, so nothing is read twice.
