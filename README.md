@@ -10,8 +10,11 @@ Instead of copying files around, every harness reads through a symlink that poin
 
 ```
 ~/.config/opencode/AGENTS.md  ──symlink──▶  double-o/instructions/AGENTS.md
-~/.agents/skills/             ──symlink──▶  double-o/skills/
 ~/.config/opencode/rules/     ──symlink──▶  double-o/rules/
+~/.agents/skills/             ──symlink──▶  double-o/skills/
+~/.claude/CLAUDE.md           ──symlink──▶  double-o/instructions/AGENTS.md
+~/.claude/rules/              ──symlink──▶  double-o/rules/
+~/.claude/skills/             ──symlink──▶  double-o/skills/
 ```
 
 Edit anything on one machine, commit, pull on another — the changes are already live behind the symlinks. No installer to re-run, no drift between machines.
