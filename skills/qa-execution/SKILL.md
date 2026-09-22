@@ -20,7 +20,7 @@ Three non-negotiables hold every session:
 
 ## Input
 
-- **qa-docs-path** (optional): root of the living QA docs tree; defaults to `docs/qa/`. The tree is this skill's memory and its only output location — never a temp dir. If it doesn't exist, run `qa-report` first; it owns the tree and its bootstrap.
+- **qa-docs-path** (optional): root of the living QA docs tree; defaults to `docs/qa/`. When the SDD loop (`00-loop`) invokes this skill it passes `.sdd/<slug>/qa`, which is **run-local working material**: gitignored, never committed, never part of the change set (Run-local mode in `../qa-report/references/qa-docs-layout.md`). The tree is this skill's memory and its only output location — never a temp dir. If it doesn't exist, run `qa-report` first; it owns the tree and its bootstrap.
 
 ## Steps
 

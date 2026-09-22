@@ -17,7 +17,7 @@ Produce `.sdd/<slug>/techspec.md`: the HOW for the approved PRD. Downstream skil
 
 - Directory: `.sdd/<slug>/` (same slug as the PRD).
 - Read first: `prd.md` — the primary input, including its Decisions and Open Questions. When it is missing, stop and ask for the PRD or for a description to work from.
-- Artifacts: `prd.md`, `techspec.md` (this skill), `design/`, `tasks.md`, `task-NN.md`, `state.yml`.
+- Artifacts: `prd.md`, `techspec.md` (this skill), `design/`, `tasks.md`, `task-NN.md`, `qa/`, `review/`, `notes/`, `state.yml`. Every run artifact stays under `.sdd/<slug>/` and is never committed (full layout: `00-loop` → Bootstrap).
 - Language: reuse the language recorded in `state.yml`; when absent, detect it per `00-prd`.
 
 ## State

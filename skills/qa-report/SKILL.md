@@ -12,6 +12,8 @@ metadata:
 
 Plan QA as journeys real people walk, not test cases that accumulate. This skill owns the project's **living QA docs** — one committed tree (`<qa-docs-path>`, default `docs/qa/`) that every round appends to — and plans the persona-driven sessions `qa-execution` runs.
 
+When the SDD loop (`00-loop`) drives this skill, `<qa-docs-path>` is `.sdd/<slug>/qa` instead: **run-local mode**, where the tree is working material for that run, already gitignored and never committed (see `references/qa-docs-layout.md` → Run-local mode).
+
 Two rules anchor everything:
 
 1. **Living docs, not round artifacts.** All durable QA knowledge lives in the one committed tree; rounds append to it (structure, durability, and anti-patterns: `references/qa-docs-layout.md`).
@@ -21,11 +23,11 @@ Choose smoke/targeted/full scope from the requested change before following the 
 
 ## Required Inputs
 
-- **qa-docs-path** (optional): root of the living tree; defaults to `docs/qa` at the repo root — a durable, committed location, never a temp dir. Honor an explicitly supplied path; use a repository-owned durable tree by default. Ask only if the intended output location is unresolved.
+- **qa-docs-path** (optional): root of the living tree; defaults to `docs/qa` at the repo root — a durable, committed location, never a temp dir. When the SDD loop (`00-loop`) invokes this skill it passes `.sdd/<slug>/qa`, which is **run-local working material**: already gitignored, never committed — so skip the bootstrap gitignore block and the committed-tree assumptions (Run-local mode in the layout reference). Honor an explicitly supplied path; use a repository-owned durable tree by default. Ask only if the intended output location is unresolved.
 
 ## Procedures
 
-**Step 1 — Resolve or bootstrap the tree.** Read `references/qa-docs-layout.md` (canonical tree, gitignore block, bootstrap procedure, adoption procedure for scattered legacy artifacts). Resolve `<qa-docs-path>`. If the tree exists, read its `README.md` and search the affected `scenarios/` and related open `bugs/` first, and build every decision below on that state; when the branch just merged parallel QA work, reconcile before planning — two files describing one behavior or one symptom fold into the older id (merge verdict fields by `last_report` recency, update references, delete the duplicate, record the fold in the cycle's report). If the tree does not exist, bootstrap it per the layout reference — directory tree, seeded `templates/`, and the gitignore block. Adopt legacy QA artifacts only when that migration is in scope; preserve historical evidence during ordinary targeted updates.
+**Step 1 — Resolve or bootstrap the tree.** Read `references/qa-docs-layout.md` (canonical tree, gitignore block, bootstrap procedure, adoption procedure for scattered legacy artifacts). Resolve `<qa-docs-path>`. If the tree exists, read its `README.md` and search the affected `scenarios/` and related open `bugs/` first, and build every decision below on that state; when the branch just merged parallel QA work, reconcile before planning — two files describing one behavior or one symptom fold into the older id (merge verdict fields by `last_report` recency, update references, delete the duplicate, record the fold in the cycle's report). If the tree does not exist, bootstrap it per the layout reference — directory tree and seeded `templates/`, plus the gitignore block outside run-local mode (skip it under `.sdd/`, which `00-loop` already ignores). Adopt legacy QA artifacts only when that migration is in scope; preserve historical evidence during ordinary targeted updates.
 
 **Step 2 — Establish project personas.** Read `references/personas.md` (seed catalog + derivation rules). Personas are durable instance data in `<qa-docs-path>/personas.md`: update them only when the product's audience changed; if absent, define the persona needed for the in-scope journey; expand the catalog when audience coverage requires it.
 

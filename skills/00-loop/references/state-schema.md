@@ -27,6 +27,20 @@
 | `blockers` | list[string] | Real external blockers, with evidence. Empty when none. |
 | `next` | string | Human-readable next action. |
 
+## Run artifact locations
+
+Every artifact is run-local under `.sdd/<slug>/` and gitignored; none of it is committed or included in the pull request. `state.yml` records progress, not paths — the layout is fixed:
+
+| Artifact | Path |
+| --- | --- |
+| PRD, TechSpec, tasks | `.sdd/<slug>/{prd.md,techspec.md,tasks.md,task-NN.md}` |
+| Interface prototypes | `.sdd/<slug>/design/` |
+| QA plans, evidence, reports | `.sdd/<slug>/qa/` (`<qa-docs-path>`) |
+| Review output | `.sdd/<slug>/review/` (`deep-review --out`) |
+| Auxiliary notes | `.sdd/<slug>/notes/` |
+
+The vendored `qa-report`, `qa-execution`, and `deep-review` skills default to committed locations; the run always passes the paths above so no step writes outside `.sdd/<slug>/`.
+
 ## Example
 
 ```yaml
