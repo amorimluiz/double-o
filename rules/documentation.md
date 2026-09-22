@@ -118,6 +118,15 @@ Decisions live in the change, not in a committed ADR:
 - Do not add ADRs or decision logs to commits or pull requests.
 - If you keep a personal decision log (for example, outside the repository in your own workflow), it stays out of the repository's change set.
 
+## Working documents and task runs
+
+Documentation created to support an in-progress task is working material, not product documentation. Specs, plans, task breakdowns, interface prototypes, QA plans and evidence, review reports, research notes, and decision scratchpads all belong to this class.
+
+- Working material lives under the run directory `.sdd/<slug>/`, which is gitignored; the SDD loop (`skills/00-loop`) owns that directory and defines its layout.
+- Never commit working material and never include it in a pull request. It is scaffolding for the change, not part of the change.
+- Every auxiliary document an agent generates to carry out a task follows the same rule — local to `.sdd/<slug>/`, out of the change set. This includes QA and review output, which the run stages under `.sdd/<slug>/qa/` and `.sdd/<slug>/review/`.
+- Only durable documentation that passes the update test above is committed. When a working document hardens into product truth, promote its content into the proper artifact (README, reference, guide) and delete the working copy — the two never coexist.
+
 ## Keep diffs clean
 
 - One concept per file, so changes stay small and conflict-free.

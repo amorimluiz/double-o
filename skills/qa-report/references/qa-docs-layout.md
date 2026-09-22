@@ -2,6 +2,8 @@
 
 The canonical living QA tree. One tree per project, committed to the repository, appended to by every QA round. This layout is the contract between `qa-report` (writes plans, registry, tracker) and `qa-execution` (writes results, reports, evidence).
 
+In **run-local mode** — the SDD loop (`00-loop`) passing `<qa-docs-path>` = `.sdd/<slug>/qa` — the same layout applies, but the tree is working material for that run: already gitignored, never committed, and never part of the change set. See the Run-local mode subsection under the version-control policy.
+
 The tree is **merge-safe** by construction: every id is content-addressed (no shared counters to collide on), every run writes its own dated files (no shared file two branches append to), and generated views are gitignored (no derived artifact to conflict over). Parallel branches running QA merge without touching each other.
 
 ## Contents
@@ -9,6 +11,7 @@ The tree is **merge-safe** by construction: every id is content-addressed (no sh
 - The canonical tree
 - What is durable vs per-run
 - Version-control policy (the gitignore block)
+- Run-local mode (SDD runs)
 - Bootstrap procedure (new project)
 - Adoption procedure (project with scattered QA artifacts)
 - Evidence policy (lean by design)
@@ -67,12 +70,23 @@ docs/qa/evidence/
 
 The rule behind the block, applied to anything new the tree accumulates: **generated or bulky → ignored; authored and reviewable → committed.** Analysis dumps, lab workspaces, exported spreadsheets, and multi-MB logs are output, not source — a 400KB generated file that changes every cycle buys permanent merge conflicts and drowns review, while its source files diff cleanly.
 
+### Run-local mode
+
+When `00-loop` invokes `qa-report` with `<qa-docs-path>` = `.sdd/<slug>/qa`, the tree is run-local working material:
+
+- **No gitignore block.** `.sdd/` is already ignored by the SDD bootstrap, so the bootstrap skips the block and writes no `.gitignore` entry for the slug.
+- **Nothing is committed.** The whole tree — scenarios, journeys, charters, bugs, reports, evidence, and the generated `state.csv` — stays out of the branch diff and the pull request.
+- **Per-run scope.** The "durable across cycles" assumption narrows to this run; the tree is the run's memory, not the project's. Cross-run durability lives in the committed tree (`docs/qa/`) when it exists.
+- **Promotion is explicit.** A finding worth keeping past the run is promoted by a separate `qa-report` invocation against the committed tree, never by un-ignoring `.sdd/`.
+
+Everything else — layout, content-addressed ids, evidence policy — is unchanged.
+
 ## Bootstrap procedure (new project)
 
 1. Create the directory tree above under `<qa-docs-path>` (add a `.gitkeep` in empty dirs when the VCS needs it).
 2. Copy the four templates into `templates/` (scenario + bug + charter from `qa-report/assets/`, report from the sibling skill's `qa-execution/assets/report-template.md` when installed).
 3. Write `README.md` with: the project's area codes for scenario ids (2-4 uppercase letters each, defined once — e.g. `AUTH`, `CHK`, `SET`), the product's entry points (URLs, CLI commands), how to start the dev server, and the evidence policy choice (default below).
-4. Write the gitignore block (above) into the project's `.gitignore`.
+4. Write the gitignore block (above) into the project's `.gitignore`. In run-local mode under `.sdd/`, skip this step — the tree is already ignored.
 
 ## Adoption procedure (project with scattered QA artifacts)
 

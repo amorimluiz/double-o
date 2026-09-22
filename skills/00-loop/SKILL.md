@@ -11,14 +11,27 @@ Entry point for the spec-driven pipeline. One prompt describes the goal; this sk
 - Never advance past a gate without explicit user approval.
 - Never mark a task complete without its tests and verification commands passing on real output.
 - Never write `state.yml` outside a checkpoint: stage transitions, task completion, blockers.
+- Every artifact the run produces stays under `.sdd/<slug>/`. Never commit a run artifact or let it enter the change set.
 </HARD-GATE>
 
 ## Bootstrap
 
 1. Resolve the repo root and the slug (kebab-case, from the prompt or the user). Ask once when ambiguous.
-2. Directory: `.sdd/<slug>/`. Create it when missing; artifacts are `prd.md`, `techspec.md`, `design/`, `tasks.md`, `task-NN.md`, `state.yml`. QA and review outputs live where their skills define them.
+2. Directory: `.sdd/<slug>/`. Create it when missing; it holds every artifact the run produces:
+   - `prd.md`, `techspec.md`, `design/`, `tasks.md`, `task-NN.md`, `state.yml`;
+   - `qa/` — the `qa-report`/`qa-execution` tree (`<qa-docs-path>` is `.sdd/<slug>/qa`, not the committed `docs/qa`);
+   - `review/` — `deep-review` output (`--out .sdd/<slug>/review/`, not the default `.deep-review/`);
+   - `notes/` — any other documentation generated to support the task (research, analysis, decisions).
+   Nothing outside `.sdd/<slug>/` is a run artifact.
 3. Ensure `.sdd/` and `.worktrees/` are ignored: add both entries to the project's `.gitignore` (create the file when missing) unless already covered. Specs and worktrees are local by design.
 4. `state.yml`: create from `references/state-schema.md` with `slug`, `goal`, `language`, `step`, `created_at`. When the file already exists, resume instead of resetting.
+
+## Run Artifacts
+
+A run produces working material, never product documentation. All of it lives under `.sdd/<slug>/` and is gitignored, so it never reaches the branch diff or the pull request. Two failure modes to avoid:
+
+- **Vendored-skill defaults.** `qa-report`, `qa-execution`, and `deep-review` default to committed locations (`docs/qa/`, `.deep-review/`). Pass the run-local path explicitly at every invocation; never let a step fall back to its default.
+- **Auxiliary docs.** Any document an agent writes mid-task to support the work — analysis of a tricky area, a comparison of options, a scratch plan — goes in `.sdd/<slug>/notes/`. If it carries durable product truth, promote it into the proper commit-worthy artifact (README, reference, guide) instead, per `rules/documentation.md`.
 
 ## Pipeline
 
@@ -32,9 +45,9 @@ Read `state.yml` first, then route by `step`:
 | `tasks` | Activate the `00-tasks` skill; on its completion, gate. |
 | `workspace` | Run the Workspace Gate below. It decides the execution workspace and provisions dependency isolation, then sets `step: execute`. |
 | `execute` | Run the Execution Loop below. |
-| `qa-report` | Run the `qa-report` skill. When it completes, set `artifacts.qa-report: done` and gate. Its applicability rules decide scope: no user-visible surface gets a recorded no-work disposition, not a fabricated run. |
-| `qa-execution` | Run the `qa-execution` skill. When it completes, set `artifacts.qa-execution: done` and gate. It owns the live sessions and browser evidence for the journeys `qa-report` planned. |
-| `review` | Run the `deep-review` skill over the branch diff. When it completes, set `artifacts.review: done` and gate. |
+| `qa-report` | Run the `qa-report` skill with `<qa-docs-path>` = `.sdd/<slug>/qa` (run-local mode: create the tree but skip its committed-tree gitignore block). When it completes, set `artifacts.qa-report: done` and gate. Its applicability rules decide scope: no user-visible surface gets a recorded no-work disposition, not a fabricated run. |
+| `qa-execution` | Run the `qa-execution` skill with `<qa-docs-path>` = `.sdd/<slug>/qa`. When it completes, set `artifacts.qa-execution: done` and gate. It owns the live sessions and browser evidence for the journeys `qa-report` planned. |
+| `review` | Run the `deep-review` skill over the branch diff with `--out .sdd/<slug>/review/`. When it completes, set `artifacts.review: done` and gate. |
 | `blocked` | Report the recorded blocker and stop. |
 | `done` | Report the closed run; ask before re-opening. |
 
@@ -43,6 +56,7 @@ Read `state.yml` first, then route by `step`:
 - QA applicability: after `execute`, the QA steps exist only when the delivered change touches an interface a user or caller exercises — UI, HTTP/UDS API, CLI, or SDK. With no such surface, set `artifacts.qa-report` and `artifacts.qa-execution` to `skipped`, state the reason in `next`, and jump to `review`.
 - Gate: report the artifact path, summarize the top decisions, ask for approval through the interactive question tool, and stop. On approval, advance `step` and continue the same turn.
 - A rejected artifact goes back to its skill (or to the fixes the user requested) before the step re-runs; never patch it silently. Code fixes the QA or review steps surface go through `execute`.
+- Run-local output: pass the run-local path to every vendored stage (`qa-report`/`qa-execution` → `.sdd/<slug>/qa`, `deep-review` → `--out .sdd/<slug>/review/`); never let a stage write to its committed default. See Run Artifacts above.
 - Further steps (ship, deploy) plug in the same way: extend the `step` values in `state.yml` and add the matching route here.
 
 ## Workspace Gate
@@ -66,7 +80,7 @@ One task per iteration. Read `tasks.md` and the task file before starting. All c
 3. Work test-first: write the task's test cases, watch them fail for the right reason (RED), implement the minimal code (GREEN), refactor with tests staying green. Follow the project's rules and the global testing and code standards. Coverage floor: 80% unit coverage of new and changed code.
 4. Verify: run the task's Verify commands plus the project's lint, typecheck, and test commands for the changed surfaces. Report real output. Repair a failing check inside this iteration; never waive it.
 5. Track: tick the task's Subtasks, Tests, and Acceptance checkboxes, set `status: completed`, and update its row in `tasks.md`.
-6. Commit: one atomic commit per task using the frontmatter's `commit` subject, a body naming the task file, and the `Assisted-by:` trailer required by the git rules. Stage only task-owned paths; never commit unrelated files.
+6. Commit: one atomic commit per task using the frontmatter's `commit` subject, a body naming the task file, and the `Assisted-by:` trailer required by the git rules. Stage only task-owned source paths; never stage `.sdd/`, run artifacts, or unrelated files.
 7. Update `state.yml`: `tasks.done + 1`, `tasks.current: null`, `last_verify`, `last_commit`, `updated_at`.
 8. Continue with the next iteration in the same turn. When every task is complete, advance `step` to `qa-report`; stop earlier only for a real blocker (`step: blocked`) or a user interrupt.
 
