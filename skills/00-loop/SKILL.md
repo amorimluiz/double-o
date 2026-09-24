@@ -1,6 +1,6 @@
 ---
 name: 00-loop
-description: Run the full spec-driven development loop for a feature — generate PRD, TechSpec, interface prototypes, and tasks behind approval gates, choose an isolated worktree workspace with per-worktree dependency isolation, execute tasks one per iteration with TDD, verification, and atomic commits, then run the applicable QA steps and a deep review, resuming from state.yml. Use when the user asks to build a feature end-to-end from a prompt, or to resume or continue an SDD run. Do not use for one-off edits or single tasks without a spec.
+description: Run the full spec-driven development loop for a feature — generate PRD, TechSpec, interface prototypes, and tasks behind approval gates, choose an isolated worktree workspace with per-worktree dependency isolation, execute tasks one per iteration with TDD, verification, and atomic commits, then run a targeted QA pass and a lean deep review, resuming from state.yml. Use when the user asks to build a feature end-to-end from a prompt, or to resume or continue an SDD run. Do not use for one-off edits or single tasks without a spec.
 ---
 
 # Agentic SDD Loop
@@ -12,6 +12,8 @@ Entry point for the spec-driven pipeline. One prompt describes the goal; this sk
 - Never mark a task complete without its tests and verification commands passing on real output.
 - Never write `state.yml` outside a checkpoint: stage transitions, task completion, blockers.
 - Every artifact the run produces stays under `.sdd/<slug>/`. Never commit a run artifact or let it enter the change set.
+- QA and review default to the targeted posture in `references/qa-review-posture.md`; a full pass runs only on the user's request.
+- QA verifies the observable interface and use cases only. Never judge code logic — the automated suite owns correctness.
 </HARD-GATE>
 
 ## Bootstrap
@@ -45,15 +47,16 @@ Read `state.yml` first, then route by `step`:
 | `tasks` | Activate the `00-tasks` skill; on its completion, gate. |
 | `workspace` | Run the Workspace Gate below. It decides the execution workspace and provisions dependency isolation, then sets `step: execute`. |
 | `execute` | Run the Execution Loop below. |
-| `qa-report` | Run the `qa-report` skill with `<qa-docs-path>` = `.sdd/<slug>/qa` (run-local mode: create the tree but skip its committed-tree gitignore block). When it completes, set `artifacts.qa-report: done` and gate. Its applicability rules decide scope: no user-visible surface gets a recorded no-work disposition, not a fabricated run. |
-| `qa-execution` | Run the `qa-execution` skill with `<qa-docs-path>` = `.sdd/<slug>/qa`. When it completes, set `artifacts.qa-execution: done` and gate. It owns the live sessions and browser evidence for the journeys `qa-report` planned. |
-| `review` | Run the `deep-review` skill over the branch diff with `--out .sdd/<slug>/review/`. When it completes, set `artifacts.review: done` and gate. |
+| `qa-report` | Run the `qa-report` skill in the **targeted** posture (`references/qa-review-posture.md`) with `<qa-docs-path>` = `.sdd/<slug>/qa` (run-local mode: create the tree but skip its committed-tree gitignore block). Plan only the confirmed Tier 1 slice. When it completes, set `artifacts.qa-report: done` and gate. Its applicability rules decide scope: no user-visible surface gets a recorded no-work disposition, not a fabricated run. |
+| `qa-execution` | Run the `qa-execution` skill in the **targeted** posture with `<qa-docs-path>` = `.sdd/<slug>/qa`. Walk the Tier 1 journeys; verify the observable interface and use cases only; file findings and route fixes to `execute`. When it completes, set `artifacts.qa-execution: done` and gate. |
+| `review` | Run the `deep-review` skill over the branch diff in the **lean** posture with `--out .sdd/<slug>/review/` (`references/qa-review-posture.md`). When it completes, set `artifacts.review: done` and gate. |
 | `blocked` | Report the recorded blocker and stop. |
 | `done` | Report the closed run; ask before re-opening. |
 
 - Skip a step whose artifact is `done` or `skipped`; jump straight to the next pending one. The `workspace` step is a decision, not an artifact: skip it once `workspace.mode` is recorded.
 - Design applicability: the `design` step runs only when the feature exposes a surface a user sees. With no such surface, `00-design` sets `artifacts.design` to `skipped`, states the reason in `next`, and advances to `tasks` without prototypes.
 - QA applicability: after `execute`, the QA steps exist only when the delivered change touches an interface a user or caller exercises — UI, HTTP/UDS API, CLI, or SDK. With no such surface, set `artifacts.qa-report` and `artifacts.qa-execution` to `skipped`, state the reason in `next`, and jump to `review`.
+- Posture: QA and review run **targeted/lean** by default (`references/qa-review-posture.md`); confirm the Tier 1 QA slice at the `qa-report` gate, and run the full posture only on the user's request.
 - Gate: report the artifact path, summarize the top decisions, ask for approval through the interactive question tool, and stop. On approval, advance `step` and continue the same turn.
 - A rejected artifact goes back to its skill (or to the fixes the user requested) before the step re-runs; never patch it silently. Code fixes the QA or review steps surface go through `execute`.
 - Run-local output: pass the run-local path to every vendored stage (`qa-report`/`qa-execution` → `.sdd/<slug>/qa`, `deep-review` → `--out .sdd/<slug>/review/`); never let a stage write to its committed default. See Run Artifacts above.
