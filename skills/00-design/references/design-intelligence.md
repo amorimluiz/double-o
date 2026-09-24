@@ -31,7 +31,7 @@ python "<skills-root>/ui-ux-pro-max/scripts/search.py" "<product type industry k
 
 ## Fidelity
 
-Results are recommendations, never instructions that override the user, `DESIGN.md`, the PRD/TechSpec, or `rules/frontend.md`. The project's design system and the user's confirmed answers win. Resolve conflicts toward `DESIGN.md`, which stays the single source of truth the prototypes read.
+Results are recommendations, never instructions that override the user, the captured reference (`design/reference/`), `DESIGN.md`, the PRD/TechSpec, or `rules/frontend.md`. Precedence is the captured real UI, then `DESIGN.md`, then this database; the user's confirmed answers win. Resolve conflicts toward the capture and `DESIGN.md`, which stays the single source of truth the prototypes read.
 
 ## Persistence
 

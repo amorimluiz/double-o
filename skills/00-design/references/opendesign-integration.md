@@ -5,12 +5,13 @@ How this skill turns approved interface decisions into prototypes on disk. The M
 ## Preconditions
 
 - The `open-design` MCP server is connected and the OpenDesign app is running. When it is missing, record the blocker and report the fix in `SETUP.md` (OpenDesign section).
+- `design/reference/fidelity.md` exists — the capture from `references/fidelity-capture.md` is complete, or explicitly marked degraded.
 - `DESIGN.md` exists at the repo root. When absent, author it first (below).
 - The interface grilling has converged; the brief is composed from confirmed answers only.
 
 ## DESIGN.md when absent
 
-Author `DESIGN.md` at the repo root in the [Google Labs format](https://github.com/google-labs-code/design.md): YAML front matter with the machine-readable tokens (`colors`, `typography`, `rounded`, `spacing`, `components`), then the markdown body in canonical order — Overview, Colors, Typography, Layout, Elevation & Depth, Shapes, Components, Do's and Don'ts. Seed the tokens from the existing codebase (CSS variables, Tailwind theme, theme files) rather than inventing values; when the project has an OpenDesign design system, read `od://design-systems/<id>/DESIGN.md` and adapt it. This file is a project artifact and outlives the feature.
+Author `DESIGN.md` at the repo root in the [Google Labs format](https://github.com/google-labs-code/design.md): YAML front matter with the machine-readable tokens (`colors`, `typography`, `rounded`, `spacing`, `components`), then the markdown body in canonical order — Overview, Colors, Typography, Layout, Elevation & Depth, Shapes, Components, Do's and Don'ts. Seed the tokens from the captured reference (`design/reference/tokens.md`) first, then the existing codebase (CSS variables, Tailwind theme, theme files); when the project has an OpenDesign design system, read `od://design-systems/<id>/DESIGN.md` and adapt it. This file is a project artifact and outlives the feature.
 
 ## Compose the brief
 
@@ -20,9 +21,11 @@ One structured prompt carrying, in order:
 2. The approved interface decisions from grilling: per screen, its information hierarchy, states, layout and responsive behavior, component reuse, interactions, and real copy.
 3. PRD business context by section reference — do not restate it.
 4. TechSpec interface and component references the prototypes must honor.
-5. The `DESIGN.md` tokens and rules: colors, type, spacing, and components the prototypes must use.
-6. The Prototype Standard from `SKILL.md`: self-contained HTML per screen, all states, responsive, accessible, real content.
-7. The requested output filenames: `NN-<screen>.html` plus `index.html`.
+5. The captured reference (`design/reference/`): the screenshot paths, `tokens.md`, and `components.md` — the real interface the prototypes must match.
+6. The fidelity contract (`design/reference/fidelity.md`): the allowed tokens and components, what is forbidden, the extend-only rule, and the approved new components.
+7. The `DESIGN.md` tokens and rules: colors, type, spacing, and components the prototypes must use.
+8. The Prototype Standard from `SKILL.md`: self-contained HTML per screen, all states, responsive, accessible, real content.
+9. The requested output filenames: `NN-<screen>.html` plus `index.html`.
 
 ## Commission the run
 
@@ -42,8 +45,8 @@ The repo copy is the approved snapshot; the OpenDesign project stays the live so
 
 ## Adjustment rounds
 
-On requested changes, refine in the same OpenDesign project — a new `start_run` with a fresh `requestId` and a prompt naming the adjustments — then re-persist and re-gate. Keep the previous HTML until the replacement is approved.
+On requested changes, refine in the same OpenDesign project — a new `start_run` with a fresh `requestId` and a prompt naming the adjustments — then re-persist, re-run the fidelity check, and re-gate. Keep the previous HTML until the replacement is approved.
 
 ## Degraded mode
 
-When OpenDesign is unavailable, write the prototypes as self-contained HTML with the local file tools, following the Prototype Standard, only on the user's explicit instruction. State clearly that these bypass OpenDesign, and record in `state.yml` that the prototypes were authored locally.
+When OpenDesign is unavailable, write the prototypes as self-contained HTML with the local file tools, following the Prototype Standard and the fidelity contract in `design/reference/fidelity.md`, only on the user's explicit instruction. State clearly that these bypass OpenDesign, and record in `state.yml` that the prototypes were authored locally.
