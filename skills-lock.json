@@ -27,6 +27,12 @@
       "skillPath": "skills/mine/architectural-analysis/SKILL.md",
       "computedHash": "f53f423b7edba88092e423800ef2f3a4d018538f538c3426b266306ac67c2be4"
     },
+    "architecture-blueprint-generator": {
+      "source": "github/awesome-copilot",
+      "sourceType": "github",
+      "skillPath": "skills/architecture-blueprint-generator/SKILL.md",
+      "computedHash": "9b20f13d1d96ba1c2550e1ce535f932e943c42939d3fae906a9e0d6c1bfb471a"
+    },
     "banner-design": {
       "source": "nextlevelbuilder/ui-ux-pro-max-skill",
       "sourceType": "github",
