@@ -25,6 +25,7 @@ Crie cada link abaixo. A coluna "Harness" indica quando ele se aplica — pule h
 | opencode | `instructions/AGENTS.md` | `~/.config/opencode/AGENTS.md` | arquivo |
 | opencode | `rules/` | `~/.config/opencode/rules/` | diretório |
 | opencode | `harnesses/opencode/opencode.jsonc` | `~/.config/opencode/opencode.jsonc` | arquivo |
+| opencode | `harnesses/opencode/cli.json` | `~/.config/opencode/cli.json` | arquivo |
 | opencode | `harnesses/opencode/package.json` | `~/.config/opencode/package.json` | arquivo |
 | claude | `instructions/AGENTS.md` | `~/.claude/CLAUDE.md` | arquivo |
 | claude | `rules/` | `~/.claude/rules/` | diretório |
@@ -33,7 +34,7 @@ Crie cada link abaixo. A coluna "Harness" indica quando ele se aplica — pule h
 
 `~/.agents/skills/` é a convenção agnóstica de harness (lida por opencode, Codex e outros). Skills globais vão para lá, não para o diretório de um harness específico. Claude Code, porém, lê apenas `~/.claude/skills/` — por isso a linha extra apontando o mesmo `skills/` para ele.
 
-**MCPs são locais à máquina — não entram no repo.** O launch spec de um MCP contém caminho absoluto do app e, às vezes, um endpoint efêmero. Versionar isso faria o `git pull` sobrescrever o spec correto de uma máquina com o de outra. Por isso o MCP não é versionado nem symlinkado: cada ferramenta gera o próprio spec no arquivo global do harness (ver [OpenDesign](#opendesign)). No opencode, `opencode.json` e `opencode.jsonc` do diretório global são mesclados — a config portável continua vindo do repo (`harnesses/opencode/opencode.jsonc` → `~/.config/opencode/opencode.jsonc`) e só o MCP fica no arquivo local.
+**MCPs são locais à máquina — não entram no repo.** O launch spec de um MCP contém caminho absoluto do app e, às vezes, um endpoint efêmero. Versionar isso faria o `git pull` sobrescrever o spec correto de uma máquina com o de outra. Por isso o MCP não é versionado nem symlinkado: cada ferramenta gera o próprio spec no arquivo global do harness (ver [OpenDesign](#opendesign)). No opencode, `opencode.json` e `opencode.jsonc` do diretório global são mesclados — a config portável continua vindo do repo (`harnesses/opencode/opencode.jsonc` → `~/.config/opencode/opencode.jsonc`) e só o MCP fica no arquivo local. A config do cliente de terminal do V2 (`cli.json`, com `plugins` de TUI como o goal plugin e o herdr) também é portável e vem do repo (`harnesses/opencode/cli.json`); o V1 `tui.json(c)` foi substituído e **não** é mais lido.
 
 ### Procedimento
 
