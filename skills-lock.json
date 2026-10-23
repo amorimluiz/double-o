@@ -75,6 +75,12 @@
       "skillPath": ".claude/skills/design-system/SKILL.md",
       "computedHash": "a8d1f1cd0f55979a872a2ce9717d3c33df23b0c378738b8d6adb574bfb266c77"
     },
+    "documentation-and-adrs": {
+      "source": "addyosmani/agent-skills",
+      "sourceType": "github",
+      "skillPath": "skills/documentation-and-adrs/SKILL.md",
+      "computedHash": "f1bd038e74194364c1dcdb3dd0a72194ffd3ca9d3a103c125ca1a62e801a0cc4"
+    },
     "documentation-writer": {
       "source": "pedronauck/skills",
       "sourceType": "github",
@@ -123,6 +129,12 @@
       "skillPath": "skills/curated/mermaid-diagrams/SKILL.md",
       "computedHash": "b6c206a3cab0333a1d3d3cf27114099d0d5f25eb07d86c8f12472b7aa7d59a4c"
     },
+    "performance-profiler": {
+      "source": "alirezarezvani/claude-skills",
+      "sourceType": "github",
+      "skillPath": "engineering/skills/performance-profiler/SKILL.md",
+      "computedHash": "52b8b62bb4e8bdbb9154cdd4f6528ca02d9d479ee5a489a1f8d275bca97cfc79"
+    },
     "qa-execution": {
       "source": "pedronauck/skills",
       "sourceType": "github",
@@ -134,6 +146,12 @@
       "sourceType": "github",
       "skillPath": "skills/mine/qa-report/SKILL.md",
       "computedHash": "90a66d78d622a2c0bd7b7231f7a3d53fa495857c6b8fafce4ce6e2fed51bee1d"
+    },
+    "service-virtualization": {
+      "source": "petrkindlmann/qa-skills",
+      "sourceType": "github",
+      "skillPath": "skills/service-virtualization/SKILL.md",
+      "computedHash": "55c803855b047c553198e3ada8030e060fad245dd384e715e851b24da9e01e1f"
     },
     "slides": {
       "source": "nextlevelbuilder/ui-ux-pro-max-skill",
@@ -164,6 +182,12 @@
       "sourceType": "github",
       "skillPath": ".claude/skills/ui-ux-pro-max/SKILL.md",
       "computedHash": "4130ce7b158f3765e014cf3e6cd9f6adf83c761db5cdd91bea9090b84d1258ce"
+    },
+    "wiremock-standalone-docker": {
+      "source": "giuseppe-trisciuoglio/developer-kit",
+      "sourceType": "github",
+      "skillPath": "plugins/developer-kit-java/skills/wiremock-standalone-docker/SKILL.md",
+      "computedHash": "135d9861546b78333221eddde9fd0603d52d6691ca3904d3fce58b78d3199837"
     },
     "writing-for-agents": {
       "source": "mattpocock/skills",
