@@ -29,10 +29,10 @@ Crie cada link abaixo. A coluna "Harness" indica quando ele se aplica — pule h
 | opencode | `harnesses/opencode/package.json` | `~/.config/opencode/package.json` | arquivo |
 | claude | `instructions/AGENTS.md` | `~/.claude/CLAUDE.md` | arquivo |
 | claude | `rules/` | `~/.claude/rules/` | diretório |
-| claude | `skills/` | `~/.claude/skills/` | diretório |
-| agnóstico | `skills/` | `~/.agents/skills/` | diretório |
+| claude | `.agents/skills/` | `~/.claude/skills/` | diretório |
+| agnóstico | `.agents/skills/` | `~/.agents/skills/` | diretório |
 
-`~/.agents/skills/` é a convenção agnóstica de harness (lida por opencode, Codex e outros). Skills globais vão para lá, não para o diretório de um harness específico. Claude Code, porém, lê apenas `~/.claude/skills/` — por isso a linha extra apontando o mesmo `skills/` para ele.
+`~/.agents/skills/` é a convenção agnóstica de harness (lida por opencode, Codex e outros). Skills globais vão para lá, não para o diretório de um harness específico. Claude Code, porém, lê apenas `~/.claude/skills/` — por isso a linha extra apontando o mesmo `.agents/skills/` para ele.
 
 **MCPs são locais à máquina — não entram no repo.** O launch spec de um MCP contém caminho absoluto do app e, às vezes, um endpoint efêmero. Versionar isso faria o `git pull` sobrescrever o spec correto de uma máquina com o de outra. Por isso o MCP não é versionado nem symlinkado: cada ferramenta gera o próprio spec no arquivo global do harness (ver [OpenDesign](#opendesign)). No opencode, `opencode.json` e `opencode.jsonc` do diretório global são mesclados — a config portável continua vindo do repo (`harnesses/opencode/opencode.jsonc` → `~/.config/opencode/opencode.jsonc`) e só o MCP fica no arquivo local. A config do cliente de terminal do V2 (`cli.json`, com `plugins` de TUI como o goal plugin e o herdr) também é portável e vem do repo (`harnesses/opencode/cli.json`); o V1 `tui.json(c)` foi substituído e **não** é mais lido.
 
@@ -81,7 +81,7 @@ Estas ferramentas trazem binário e artefatos próprios. **Não** os crie nem os
 | herdr | skills `herdr` e `herdr-orchestration` | ver [herdr](#herdr) | `herdr --version` e `herdr integration status` |
 | OpenDesign | skill `00-design` e MCP `open-design` (opencode e Claude Code) | ver [OpenDesign](#opendesign) | daemon de pé (`curl http://127.0.0.1:7456/api/health`) e MCP `connected` no harness |
 
-O lock do skills CLI é estado local da máquina e **não** é versionado. A procedência canônica e versionada das skills fica em `skills-lock.json` na raiz do repo.
+O lock do skills CLI **local à máquina** (`.skill-lock.json`, em `~/.agents/`) **não** é versionado. A procedência canônica e versionada das skills é o `skills-lock.json` na raiz do repo — o **lock de projeto**, gerado pelo próprio CLI (`npx skills add` em escopo de projeto) e restaurado com `npx skills experimental_install`. Nunca edite esse arquivo à mão.
 
 ### RTK
 
@@ -143,9 +143,9 @@ Gerenciador de workspace de terminal para agentes, com servidor persistente e CL
 
 1. **Instale o binário.** Linux/macOS: `curl -fsSL https://herdr.dev/install.sh | sh`. Windows (PowerShell): `powershell -ExecutionPolicy Bypass -c "irm https://herdr.dev/install.ps1 | iex"`. Confirme com `herdr --version`.
 2. **Instale a integração do harness em uso** para que o herdr reconheça o estado dos agentes: `herdr integration install opencode` (há alvos para claude, codex, cursor, entre outros). Confirme com `herdr integration status` — o harness em uso deve aparecer como `current`.
-3. **As skills vêm do repo**, não do instalador: `herdr` e `herdr-orchestration` já chegam via symlink de `skills/`. Use `npx skills update` apenas para atualizá-las.
+3. **As skills vêm do repo**, não do instalador: `herdr` e `herdr-orchestration` já chegam via symlink de `.agents/skills/`. Use `npx skills update -p` apenas para atualizá-las.
 
-A integração escreve um plugin gerado (ex.: `~/.config/opencode/plugins/herdr-agent-state.js`) — artefato local à máquina, não versionado. A skill canônica também sai de `herdr --skill`; a cópia versionada em `skills/herdr/` é a mesma.
+A integração escreve um plugin gerado (ex.: `~/.config/opencode/plugins/herdr-agent-state.js`) — artefato local à máquina, não versionado. A skill canônica também sai de `herdr --skill`; a cópia versionada em `.agents/skills/herdr/` é a mesma.
 
 ### Dependências do plugin (opencode)
 

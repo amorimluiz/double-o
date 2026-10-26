@@ -11,10 +11,10 @@ Instead of copying files around, every harness reads through a symlink that poin
 ```
 ~/.config/opencode/AGENTS.md  ──symlink──▶  double-o/instructions/AGENTS.md
 ~/.config/opencode/rules/     ──symlink──▶  double-o/rules/
-~/.agents/skills/             ──symlink──▶  double-o/skills/
+~/.agents/skills/             ──symlink──▶  double-o/.agents/skills/
 ~/.claude/CLAUDE.md           ──symlink──▶  double-o/instructions/AGENTS.md
 ~/.claude/rules/              ──symlink──▶  double-o/rules/
-~/.claude/skills/             ──symlink──▶  double-o/skills/
+~/.claude/skills/             ──symlink──▶  double-o/.agents/skills/
 ```
 
 Edit anything on one machine, commit, pull on another — the changes are already live behind the symlinks. No installer to re-run, no drift between machines.
@@ -26,7 +26,7 @@ double-o/
 ├── instructions/          # Canonical agent instruction files
 │   └── AGENTS.md          # Global governance (not auto-loaded from here)
 ├── rules/                 # Engineering standards, one topic per file
-├── skills/                # Canonical skills, one folder per skill
+├── .agents/skills/        # Canonical skills, one folder per skill (harness-standard location)
 │   ├── 00-loop/           # SDD pipeline: entry point + execution loop
 │   ├── 00-prd/            # SDD pipeline: product requirements
 │   ├── 00-techspec/       # SDD pipeline: technical design
@@ -37,7 +37,7 @@ double-o/
 │   └── opencode/
 │       ├── opencode.jsonc
 │       └── package.json
-├── skills-lock.json       # Provenance and versions for installed skills
+├── skills-lock.json       # Project lock (CLI-generated): source + hash per skill
 ├── SETUP.md               # Agent-followable install instructions
 └── README.md
 ```
@@ -57,15 +57,15 @@ On a new machine, hand [`SETUP.md`](SETUP.md) to your agent. It detects the inst
 
 ## Managing skills
 
-The `00-*` skills (the SDD pipeline) are authored in this repo. The rest are fetched with the [Skills CLI](https://skills.sh) and kept in `skills/` as the canonical source.
+The `00-*` skills (the SDD pipeline) are authored in this repo. The rest are fetched with the [Skills CLI](https://skills.sh) and kept in `.agents/skills/` — the harness-standard shared location — as the canonical source.
 
 ```bash
 npx skills find <query>                                  # search
-npx skills add <owner/repo> --skill <name> -y            # fetch a skill
-npx skills update                                        # update tracked skills
+npx skills add <owner/repo> --skill <name> -y            # fetch a skill (project scope)
+npx skills update -p                                     # update tracked skills
 ```
 
-After fetching, move the skill folder into `skills/` so it becomes part of the canonical set. `skills-lock.json` records where each skill came from.
+`npx skills add` in project scope (without `-g`) installs into `.agents/skills/` and records the provenance in `skills-lock.json` — the versioned project lock, written by the CLI and never hand-edited. On a new machine the lock restores the vendored set with `npx skills experimental_install`. The machine-local `.skill-lock.json` under `~/.agents/` is generated state and is not versioned.
 
 ## Adding a harness
 
