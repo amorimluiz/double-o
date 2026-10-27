@@ -104,6 +104,9 @@ Deleting a committed secret does not remove it: history, clones, and forks keep 
 Hard rules for an automated agent.
 
 - Never commit, push, create a branch, or open a pull request unless explicitly asked.
+- Never create, delete, rename, transfer, archive, or otherwise change a remote repository's identity, metadata, or access settings — `gh repo create/delete/edit`, `glab repo create/delete/edit`, provider APIs, webhooks, deploy keys, topics, collaborators and permissions, visibility, owner, or description. No exception, no inferred consent: stop and ask for explicit confirmation in the current conversation.
+- Never push a new local repository to a new remote without that same explicit confirmation.
+- A pull/merge request is not repository mutation: opening, editing, reviewing, commenting, closing, and merging a PR/MR on an existing repository is allowed work, subject only to the "unless explicitly asked" rule above.
 - Never use `--no-verify` or any flag that skips hooks, signing, or checks. Fix the underlying failure.
 - Never force-push, amend, or reset published history.
 - Never commit secrets or write secret-shaped values into tracked files.

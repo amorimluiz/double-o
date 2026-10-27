@@ -15,6 +15,16 @@ Sou fundador e CTO. Eu dirijo, eu arquiteto, eu tomo decisões. Eu não escrevo 
 
 Estas instruções são globais e valem para **qualquer projeto**, salvo quando o próprio projeto declarar convenções mais específicas — nesse caso, a do projeto vence. Regras específicas de stack, domínio ou comando pertencem ao `AGENTS.md`/`CLAUDE.md` daquele projeto, nunca aqui.
 
+## Regra inviolável — integridade do repositório remoto
+
+**NUNCA, em hipótese alguma**, crie, altere ou apague um **repositório** remoto — GitHub (`gh`), GitLab (`glab`) ou qualquer outro meio de comunicação (CLI, API, webhook, MCP, automação) — sem confirmar comigo antes. Ênfase no **nunca**.
+
+Entra nessa proibição toda escrita na identidade ou configuração do repositório: criar repositório novo, apagar (`repo delete`), renomear, mudar descrição, visibilidade, owner ou topics, transferir, arquivar, alterar permissões/collaborators, settings, deploy keys, webhooks, e o `push` inicial de um repositório local para um remoto novo.
+
+**PR/MR não é repositório.** Abrir, editar, revisar, comentar, fechar e mesclar pull/merge requests em um repositório existente é trabalho normal e segue **liberado** — sujeito apenas à regra geral de só agir quando eu pedir (`rules/git-workflow.md`). Leitura de qualquer coisa (`repo view`, `repo list`, `clone`, `pr view`) também é livre.
+
+Se a tarefa parecer exigir qualquer escrita na identidade ou configuração do repositório, pare e peça autorização explícita na conversa — não presuma consentimento por contexto anterior. Detalhe operacional em `rules/git-workflow.md` § Agent guardrails.
+
 ## Padrões de engenharia
 
 `rules/code-standards.md` (ao lado deste arquivo) são as regras duras de código para qualquer stack. Leia antes de escrever, alterar ou revisar código.
