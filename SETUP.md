@@ -32,9 +32,9 @@ Crie cada link abaixo. A coluna "Harness" indica quando ele se aplica — pule h
 | claude | `.agents/skills/` | `~/.claude/skills/` | diretório |
 | agnóstico | `.agents/skills/` | `~/.agents/skills/` | diretório |
 
-`~/.agents/skills/` é a convenção agnóstica de harness (lida por opencode, Codex e outros). Skills globais vão para lá, não para o diretório de um harness específico. Claude Code, porém, lê apenas `~/.claude/skills/` — por isso a linha extra apontando o mesmo `.agents/skills/` para ele.
+`~/.agents/skills/` é a convenção agnóstica de harness. Skills globais vão para lá, não para o diretório de um harness específico. OpenCode V2 descobre `~/.agents/skills` e `~/.claude/skills` como caminhos de compatibilidade, então o symlink agnóstico o cobre — não existe link de skills específico do opencode. Claude Code lê apenas `~/.claude/skills/` — por isso a linha extra apontando o mesmo `.agents/skills/` para ele.
 
-**MCPs são locais à máquina — não entram no repo.** O launch spec de um MCP contém caminho absoluto do app e, às vezes, um endpoint efêmero. Versionar isso faria o `git pull` sobrescrever o spec correto de uma máquina com o de outra. Por isso o MCP não é versionado nem symlinkado: cada ferramenta gera o próprio spec no arquivo global do harness (ver [OpenDesign](#opendesign)). No opencode, `opencode.json` e `opencode.jsonc` do diretório global são mesclados — a config portável continua vindo do repo (`harnesses/opencode/opencode.jsonc` → `~/.config/opencode/opencode.jsonc`) e só o MCP fica no arquivo local. A config do cliente de terminal do V2 (`cli.json`, com `plugins` de TUI como o goal plugin e o herdr) também é portável e vem do repo (`harnesses/opencode/cli.json`); o V1 `tui.json(c)` foi substituído e **não** é mais lido.
+**MCPs são locais à máquina — não entram no repo.** O launch spec de um MCP contém caminho absoluto do app e, às vezes, um endpoint efêmero. Versionar isso faria o `git pull` sobrescrever o spec correto de uma máquina com o de outra. Por isso o MCP não é versionado nem symlinkado: cada ferramenta gera o próprio spec no arquivo global do harness (ver [OpenDesign](#opendesign)). No OpenCode V2, `opencode.json` e `opencode.jsonc` do diretório global são documentos separados, carregados e mesclados — a config portável continua vindo do repo (`harnesses/opencode/opencode.jsonc` → `~/.config/opencode/opencode.jsonc`) e só o MCP fica no arquivo local (`~/.config/opencode/opencode.json`). O formato nativo do V2 é `mcp.servers.<nome>`; `opencode mcp add <nome> --global -- <comando...>` grava a entrada sem reescrever o restante, mas o parser atual não aceita flags dentro do comando — nesse caso, edite a entrada à mão. A config do cliente de terminal (`cli.json`, com `plugins` de TUI como o goal plugin e o herdr) também é portável e vem do repo (`harnesses/opencode/cli.json`); o V1 `tui.json(c)` foi substituído e **não** é mais lido.
 
 ### Procedimento
 
@@ -107,9 +107,9 @@ App local-first que expõe um servidor **MCP stdio** com os projetos/arquivos de
 **macOS / Windows — app desktop**
 
 1. **Instale o app desktop** em [open-design.ai](https://open-design.ai/) ou [GitHub Releases](https://github.com/nexu-io/open-design/releases). Abra-o uma vez.
-2. **Gere o spec do MCP.** Em **Settings → MCP server**, selecione o harness (**OpenCode** / **Claude Code**) e copie o snippet. Ele já traz os caminhos absolutos e o endpoint do sidecar desta máquina. O app empacotado no Windows **não** põe o comando `od` no PATH ([nexu-io/open-design#4852](https://github.com/nexu-io/open-design/issues/4852)) — se o snippet citar `"command": "od"`, use o que aponta para o executável do app.
-3. Salve no arquivo global do harness (OpenCode: `~/.config/opencode/opencode.json`, chave `mcp`, `type: "local"`; Claude Code: `claude mcp add-json … --scope user`). Specs de MCP são **locais à máquina** — não versione nem symlinke.
-4. Reinicie o harness; o servidor aparece como `open-design`.
+2. **Gere o spec do MCP.** Em **Settings → MCP server**, selecione o harness (**OpenCode** / **Claude Code**) e copie o snippet. Ele já traz os caminhos absolutos e o endpoint do sidecar desta máquina. O app empacotado no Windows **não** põe o comando `od` no PATH ([nexu-io/open-design#4852](https://github.com/nexu-io/open-design/issues/4852)) — se o snippet citar o comando `od`, use o que aponta para o executável do app como primeiro item de `command` (V2 usa array, não string).
+3. Salve no arquivo global do harness — OpenCode: entrada sob `mcp.servers` em `~/.config/opencode/opencode.json` (o `opencode mcp add open-design --global -- <comando...>` só serve quando o comando não tem flags próprias); Claude Code: `claude mcp add-json … --scope user`. Specs de MCP são **locais à máquina** — não versione nem symlinke.
+4. Confirme com `opencode mcp list`; o OpenCode V2 recarrega a config e reconecta os MCPs sem reiniciar. O servidor aparece como `open-design`.
 5. O app precisa estar aberto (parado, o MCP tenta subir uma instância headless). Ao reinstalar/atualizar, o endpoint do sidecar muda: **regenere o snippet**.
 
 **Linux — daemon via Docker (não há artefato pré-buildado)**
@@ -121,12 +121,15 @@ O release oficial só publica macOS/Windows ([#4368](https://github.com/nexu-io/
    - `docker-compose.yml`: serviço único com a imagem `ghcr.io/nexu-io/od:latest`, `ports: ["127.0.0.1:7456:7456"]`, volume `open_design_data:/app/.od`, `restart: always`. Base: [`deploy/docker-compose.yml`](https://github.com/nexu-io/open-design/blob/main/deploy/docker-compose.yml) — remova o `build:` e suba com `--no-build`.
 2. Suba e valide: `docker compose up -d --no-build` → `curl -fsS http://127.0.0.1:7456/api/health`.
 3. Registre o MCP. Dentro da imagem o CLI é `/app/apps/daemon/dist/cli.js` (o `od` do PATH da imagem é o BusyBox `od`), então o harness executa o MCP via `docker exec`:
-   - OpenCode (`~/.config/opencode/opencode.json`):
-     ```json
-     "open-design": {
-       "type": "local",
-       "command": ["docker","exec","-i","open-design","node","/app/apps/daemon/dist/cli.js","mcp","--daemon-url","http://127.0.0.1:7456"],
-       "enabled": true
+   - OpenCode — cole em `~/.config/opencode/opencode.json` (o `opencode mcp add` não aceita as flags do `docker exec`):
+     ```jsonc
+     "mcp": {
+       "servers": {
+         "open-design": {
+           "type": "local",
+           "command": ["docker","exec","-i","open-design","node","/app/apps/daemon/dist/cli.js","mcp","--daemon-url","http://127.0.0.1:7456"]
+         }
+       }
      }
      ```
    - Claude Code:
@@ -145,17 +148,17 @@ Gerenciador de workspace de terminal para agentes, com servidor persistente e CL
 2. **Instale a integração do harness em uso** para que o herdr reconheça o estado dos agentes: `herdr integration install opencode` (há alvos para claude, codex, cursor, entre outros). Confirme com `herdr integration status` — o harness em uso deve aparecer como `current`.
 3. **As skills vêm do repo**, não do instalador: `herdr` e `herdr-orchestration` já chegam via symlink de `.agents/skills/`. Use `npx skills update -p` apenas para atualizá-las.
 
-A integração escreve um plugin gerado (ex.: `~/.config/opencode/plugins/herdr-agent-state.js`) — artefato local à máquina, não versionado. A skill canônica também sai de `herdr --skill`; a cópia versionada em `.agents/skills/herdr/` é a mesma.
+A integração escreve dois plugins gerados — `~/.config/opencode/plugins/herdr-agent-state.js` (parte server) e `~/.config/opencode/herdr-opencode/tui.js` (parte TUI, o entrypoint que o OpenCode V2 descobre) — além de registrar `./herdr-opencode` em `cli.json`. São artefatos locais à máquina, não versionados. O instalador também recria o `tui.jsonc` V1 para o próprio check de integração (`herdr integration status`); com `cli.json` presente, o OpenCode V2 não o usa. A skill canônica também sai de `herdr --skill`; a cópia versionada em `.agents/skills/herdr/` é a mesma.
 
 ### Dependências do plugin (opencode)
 
 O diretório global do opencode precisa das dependências do plugin:
 
 ```bash
-cd ~/.config/opencode && bun install
+cd ~/.config/opencode && npm install
 ```
 
-`package.json` é symlinkado do repo (`harnesses/opencode/package.json`) e declara `@opencode-ai/plugin`.
+`package.json` é symlinkado do repo (`harnesses/opencode/package.json`) e declara `@opencode/plugin` (o SDK do contrato de plugins do OpenCode V2). Plugins locais sem imports do SDK continuam funcionando sem dependência adicional.
 
 ## Verificação
 
@@ -165,6 +168,7 @@ Para cada link criado:
 2. Um arquivo de teste escrito em `REPO` aparece no destino sem nova cópia.
 3. O harness inicia sem erro e enxerga os artefatos:
    - opencode: `/init` não deve recriar `AGENTS.md`; skills aparecem na lista de skills disponíveis.
+   - opencode (plugins V2): `opencode plugin list` mostra `herdr.opencode`, `rtk` e `local.goal-mode.server`; `opencode plugin check` não reporta atualização pendente; `herdr integration status` mostra `opencode: current`.
 4. Para libs: `rtk init --show` lista a integração do harness como instalada.
 5. Ferramentas externas: rode os comandos de verificação da tabela da Parte 2 e os pré-requisitos da seção anterior. Um comando que falha indica uma skill quebrada naquela máquina.
 6. MCP (OpenDesign): com o app aberto, o servidor `open-design` aparece no opencode (ex.: `opencode mcp list`).

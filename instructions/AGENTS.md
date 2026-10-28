@@ -77,6 +77,18 @@ Quando eu clonar este repo em outra máquina e pedir o setup, execute o [`SETUP.
 
 O setup só termina quando a verificação do `SETUP.md` passa: symlinks resolvendo para o repo e os comandos de verificação da tabela da Parte 2 executando sem erro. A tabela da Parte 2 é o rastreio canônico — cada ferramenta diz para que skill ou harness é necessária e como se verifica.
 
+## Orquestração — OpenCode V2
+
+Quando eu pedir para orquestrar OpenCode com um modelo específico (principalmente via herdr), o TUI principal (`opencode` sem subcomando) **não aceita** `--model` no V2: a flag não seleciona o modelo e o agente sobe com o padrão, o que gera modelo errado e loop de thinking. Para pane interativo, use o harness mini:
+
+```bash
+opencode mini --model <provider>/<model>
+```
+
+- `mini --model` aceita só `provider/model`, sem `#variant`.
+- Execução não interativa continua em `opencode run --model <provider>/<model>[#variant]`.
+- Se um pane do herdr usar o modelo errado ou entrar em loop de thinking, confira o comando de spawn: o `--model` precisa estar no `mini`, não no `opencode`.
+
 ## Idioma
 
 - **Documentação de agente:** este arquivo e a governança em português; `rules/*` e padrões de engenharia em inglês.

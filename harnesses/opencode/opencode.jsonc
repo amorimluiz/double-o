@@ -1,5 +1,6 @@
 {
   "$schema": "https://opencode.ai/config.json",
-  "permission": "allow",
-  "plugins": ["@prevalentware/opencode-goal-plugin"]
+  "permissions": [
+    { "action": "*", "resource": "*", "effect": "allow" }
+  ]
 }
