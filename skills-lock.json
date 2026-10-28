@@ -127,6 +127,18 @@
       "skillPath": "skills/frontend-design/SKILL.md",
       "computedHash": "89496d5dd00f4810205f351759594fc2742bf8eea85a2f2b2d1de59f4bd91576"
     },
+    "harness-engineering": {
+      "source": "paladini/harness-score",
+      "sourceType": "github",
+      "skillPath": "plugins/claude-code/skills/harness-engineering/SKILL.md",
+      "computedHash": "c8fc7ac0ee1718d800bffe05102d6bf5f39ef8e9d79c1ab581e97cedaa233a46"
+    },
+    "harness-eval": {
+      "source": "tech-leads-club/agent-skills",
+      "sourceType": "github",
+      "skillPath": "packages/skills-catalog/skills/(development)/harness-eval/SKILL.md",
+      "computedHash": "97253e2cc514774ee4e1de114d3373d13dd82b33fa27011d93000e7442e0ffe2"
+    },
     "herdr": {
       "source": "herdrdev/herdr",
       "sourceType": "github",
@@ -258,6 +270,18 @@
       "sourceType": "github",
       "skillPath": "skills/engineering/tdd/SKILL.md",
       "computedHash": "daf55026f456af104a72fa43247f7bcec89e5127316dc5b1b8d675d6a9d8ce94"
+    },
+    "the-judge": {
+      "source": "tech-leads-club/agent-skills",
+      "sourceType": "github",
+      "skillPath": "packages/skills-catalog/skills/(quality)/the-judge/SKILL.md",
+      "computedHash": "f938ba8870f8846136305a1dec9651a068268478e9e05b0b3eebd635bf3f9c0b"
+    },
+    "tlc-spec-lean": {
+      "source": "tech-leads-club/agent-skills",
+      "sourceType": "github",
+      "skillPath": "packages/skills-catalog/skills/(development)/tlc-spec-lean/SKILL.md",
+      "computedHash": "e51cae858f253231331e6e3402c4fa1d57e99824a9b77770367e57de6180dd26"
     },
     "to-prompt": {
       "source": "pedronauck/skills",
