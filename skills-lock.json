@@ -295,6 +295,13 @@
       "skillPath": "skills/redis-core/SKILL.md",
       "computedHash": "3b6196044dfba0f77942f20030faab03ca0741c396ba8d759c179710ebd2a7dd"
     },
+    "resolving-merge-conflicts": {
+      "source": "mattpocock/skills",
+      "ref": "v1.2.3",
+      "sourceType": "github",
+      "skillPath": "skills/engineering/resolving-merge-conflicts/SKILL.md",
+      "computedHash": "28aad6f8b1b7025abc8892fa8890f68fe1533499b28a565f416b159131d22fad"
+    },
     "service-virtualization": {
       "source": "petrkindlmann/qa-skills",
       "sourceType": "github",
