@@ -73,6 +73,42 @@
       "skillPath": "skills/create-readme/SKILL.md",
       "computedHash": "d0ece1b2164ce1376e4ab6e98d6ac079df3a2a94f5f02224362b6a1ce2516ae9"
     },
+    "dd-account-setup": {
+      "source": "datadog-labs/agent-skills",
+      "sourceType": "github",
+      "skillPath": "dd-account-setup/SKILL.md",
+      "computedHash": "7e8c1dcdb14a7b34b6ec704ee1674ff473f15f250850f63db83ea8b00cf58c71"
+    },
+    "dd-apm": {
+      "source": "datadog-labs/agent-skills",
+      "sourceType": "github",
+      "skillPath": "dd-apm/SKILL.md",
+      "computedHash": "ad6de66bbf642ac9cbabd0701cd45f4fb2f5d3e7fce6de5fd28ddcefd98a7e3f"
+    },
+    "dd-docs": {
+      "source": "datadog-labs/agent-skills",
+      "sourceType": "github",
+      "skillPath": "dd-docs/SKILL.md",
+      "computedHash": "fddb229e258558a4fc311ad65c8728d2b4f3feb88d3a77584cdcdea4d2122db3"
+    },
+    "dd-logs": {
+      "source": "datadog-labs/agent-skills",
+      "sourceType": "github",
+      "skillPath": "dd-logs/SKILL.md",
+      "computedHash": "0893cb6db46773ca832f30e19e9d72d2b9d2b57010dad3dfcfc88994e747968c"
+    },
+    "dd-monitors": {
+      "source": "datadog-labs/agent-skills",
+      "sourceType": "github",
+      "skillPath": "dd-monitors/SKILL.md",
+      "computedHash": "a2525d18e7c9f644bc18d219c6207f534141e62a25269d42dda16921aaa0f7e5"
+    },
+    "dd-pup": {
+      "source": "datadog-labs/agent-skills",
+      "sourceType": "github",
+      "skillPath": "dd-pup/SKILL.md",
+      "computedHash": "99b5137ce02324113d9c53d76ea6b73beaf9419939797489caad4619e0345f1c"
+    },
     "deep-review": {
       "source": "pedronauck/skills",
       "sourceType": "github",
