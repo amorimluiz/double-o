@@ -1,0 +1,444 @@
+---
+name: dd-pup
+description: Datadog CLI (pup) for Datadog app URLs and API operations, including notebooks, dashboards, metrics, logs, monitors, traces, and SLOs. Use pup instead of browser automation for those links.
+metadata:
+  version: "1.0.4"
+  author: datadog-labs
+  repository: https://github.com/datadog-labs/agent-skills
+  tags: datadog,cli,dd-pup,pup
+  alwaysApply: "false"
+---
+
+# pup (Datadog CLI)
+
+Pup CLI for Datadog API operations. Supports OAuth2 and API key auth.
+
+## Routing
+
+Use this skill for Datadog app URLs and read-only Datadog investigations, including notebooks, dashboards, monitors, logs, metrics, traces, SLOs, incidents, and audit logs. Take the numeric id from a notebook URL such as `https://app.datadoghq.com/notebook/<notebook-id>/...` and run `pup notebooks get <notebook-id>`. The same applies on other Datadog sites (`app.datadoghq.eu`, `us3.datadoghq.com`, `us5.datadoghq.com`, `ap1.datadoghq.com`, `ap2.datadoghq.com`, `ddog-gov.com`). Prefer `pup` over browser automation unless the user explicitly asks for visual inspection.
+
+## Quick Reference
+
+| Task | Command |
+|------|---------|
+| Search error logs | `pup logs search --query "status:error" --from 1h` |
+| List monitors | `pup monitors list` |
+| Diff a monitor definition | `pup monitors diff <monitor-id> monitor.json` |
+| Schedule monitor downtime | `pup downtime create --file downtime.json` |
+| Open a dashboard at a live time window | `pup dashboards url <dashboard-id> --from now-1h --to now --live true` |
+| Find recent slow traces for a service (last 1h) | `pup traces search --query "service:<service-name> @duration:>500000000" --from 1h` |
+| List incidents | `pup incidents list --limit 50` |
+| Import incident payload | `pup incidents import --file incident.json` |
+| Query metrics | `pup metrics query --query "avg:system.cpu.user{*}"` |
+| List hosts | `pup infrastructure hosts list --count 50` |
+| Check SLOs | `pup slos list` |
+| On-call teams | `pup on-call teams list` |
+| Triage open critical security signals (last 1h) | `pup security signals list --query "status:open severity:critical" --from 1h --limit 100` |
+| Search audit logs | `pup audit-logs search --query "@action:deleted" --from 24h` |
+| Audit activity by user | `pup audit-logs search --query "@usr.email:user@example.com" --from 7d` |
+| Investigate API key | `pup audit-logs search --query "@metadata.api_key.id:KEY_ID" --from 90d` |
+| Check auth | `pup auth status` |
+| Token expiry (time left) | `pup auth status` |
+| Refresh token | `pup auth refresh` |
+
+## Prerequisites
+
+Install pup using the [setup instructions](https://github.com/datadog-labs/agent-skills/tree/main?tab=readme-ov-file#setup-pup).
+
+## Required Input Resolution
+
+For commands that need specific scope values (`<env>`, `<service-name>`, `<team-id>`, resource IDs), use this order:
+
+1. Check context first (conversation history, prior command output, saved variables).
+2. If missing, run a discovery command first (list/search) to get valid values.
+3. If still missing or ambiguous, ask the user to confirm the exact value.
+4. Then run the target command.
+5. Never run commands with unresolved placeholders like `<env>` or `<monitor-id>`.
+
+## Auth
+
+```bash
+pup auth login                 # OAuth2 browser flow (recommended)
+pup auth login --site <site>  # Log into a specific Datadog site
+pup auth login --org <name>   # Store a named org session
+pup auth status                # Check token validity and time remaining
+pup auth list                  # List stored org sessions
+pup auth refresh               # Refresh the access token (no browser)
+pup auth test                  # Test the current credentials
+pup auth logout                # Clear credentials
+```
+
+Access tokens last about an hour. Pup refreshes them before they expire. If a command still fails with 401:
+
+```bash
+pup auth refresh        # Try refresh first
+pup auth login          # If refresh fails, full re-auth
+```
+
+Pass `--org <name>` on any command to select a session created with `pup auth login --org`. A 403 is a missing scope, not an expired token. Opt into an extra scope with `pup auth login --extra-scopes <scope>`.
+
+If Chrome opens the wrong profile/window, use the one-time OAuth URL printed by `pup auth login`
+(`If the browser doesn't open, visit: ...`) and open that link manually in the correct account session.
+
+### Headless/CI (no browser)
+
+Pup reads `DD_API_KEY`, `DD_APP_KEY`, and `DD_SITE` from the environment. Configure
+those secrets in the CI secret store or shell environment outside the agent session.
+
+## Command Reference
+
+### Monitors
+```bash
+pup monitors list --limit 10
+pup monitors list --tags "env:<env>"
+pup monitors get <monitor-id>
+pup monitors search --query "<monitor-name>"
+pup monitors create --file monitor.json
+pup monitors update <monitor-id> --file monitor.json
+pup monitors diff <monitor-id> monitor.json
+pup monitors delete <monitor-id>
+# No pup monitors mute/unmute commands; use downtime payloads instead.
+pup downtime create --file downtime.json
+```
+
+### Logs
+```bash
+pup logs search --query "status:error" --from 1h
+pup logs search --query "service:<service-name>" --from 1h --limit 100
+pup logs search --query "@http.status_code:5*" --from 24h
+pup logs search --query "env:<env> level:error" --from 1h
+pup logs aggregate --query "service:<service-name>" --compute count --from 1h
+# Lookbacks past hot retention need an explicit storage tier.
+pup logs search --query "service:<service-name>" --from 15d --storage flex
+```
+
+### Metrics
+```bash
+pup metrics query --query "avg:system.cpu.user{*}" --from 1h --to now
+pup metrics query --query "sum:trace.express.request.hits{service:<service-name>}" --from 1h --to now
+pup metrics list --filter "system.*"
+```
+
+### APM / Traces
+```bash
+# Confirm env tag with the user first (do not assume production/prod/prd).
+# --env is required on these service commands.
+pup apm services list --env <env> --from 1h --to now
+pup apm services stats --env <env> --from 1h --to now
+pup apm services operations --env <env> --service <service-name> --from 1h --to now
+pup apm services resources --env <env> --service <service-name> --name <operation> --from 1h --to now
+
+# Span @duration is nanoseconds. 500ms = 500000000. 1s = 1000000000.
+pup traces search --query "service:<service-name>" --from 1h
+pup traces search --query "service:<service-name> @duration:>500000000" --from 1h
+pup traces search --query "service:<service-name> status:error" --from 1h
+pup traces get <trace-id>
+pup traces aggregate --query "service:<service-name>" --compute "avg(@duration)" --group-by resource_name --from 1h
+```
+
+### Incidents
+```bash
+pup incidents list --limit 50
+pup incidents get <incident-id>
+pup incidents import --file incident.json
+```
+
+### Dashboards
+```bash
+pup dashboards list
+pup dashboards get <dashboard-id> --read-only
+pup dashboards url <dashboard-id> --from now-1h --to now --live true
+pup dashboards create --file dashboard.json
+pup dashboards update <dashboard-id> --file dashboard.json
+pup dashboards delete <dashboard-id>
+pup dashboards diff <dashboard-id> dashboard.json
+# Widget edits and page annotations have their own subcommands.
+pup dashboards widgets --help
+pup dashboards annotations --help
+```
+
+#### Safe dashboard create, clone, and update workflow
+
+The goal is a recoverable source and a verified destination. A successful API response alone does not prove that widget content or placement was preserved.
+
+1. Fetch the source or update target with `--read-only` and save the exact response as an immutable snapshot. Never overwrite this file with transformed JSON.
+   ```bash
+   pup dashboards get <dashboard-id> --read-only -o json > dashboard-source.json
+   ```
+2. Build a separate mutation payload. Remove response-only fields before create/update: `author_handle`, `author_name`, `created_at`, `id`, `modified_at`, and `url`.
+   ```bash
+   jq 'del(.author_handle, .author_name, .created_at, .id, .modified_at, .url)' \
+     dashboard-source.json > dashboard-payload.json
+   ```
+3. For a backup or clone, leave the source dashboard unchanged and change only explicitly requested fields, usually `title` or `description`. Preserve `layout_type`, `reflow_type`, widget order, and every recursive widget `layout` object (`x`, `y`, `width`, `height`, and `is_column_break`). Repacking or compacting coordinates creates a derived layout, not an exact clone.
+4. Create or update from `dashboard-payload.json`, then fetch the destination into a new file.
+   ```bash
+   pup dashboards create --file dashboard-payload.json
+   pup dashboards get <destination-id> --read-only -o json > dashboard-destination.json
+   ```
+5. Normalize away the response-only fields and compare the complete definitions. The only differences should be the fields intentionally changed.
+6. Also compare layout projections separately so a placement regression cannot hide in a large widget diff:
+   ```bash
+   jq '{layout_type, reflow_type, layouts: [.. | objects | .layout? // empty]}' dashboard-source.json
+   jq '{layout_type, reflow_type, layouts: [.. | objects | .layout? // empty]}' dashboard-destination.json
+   ```
+
+Pup has no dashboard version-history command. If an exact historical version is required and no immutable snapshot exists, inspect version history in the Datadog UI before changing the dashboard. `pup dashboards diff <dashboard-id> dashboard-payload.json` compares a candidate file to the live dashboard without writing it.
+
+### SLOs
+```bash
+pup slos list
+pup slos get <slo-id>
+pup slos status <slo-id> --from 30d --to now
+pup slos create --file slo.json
+```
+
+### Synthetics
+```bash
+pup synthetics tests list
+pup synthetics tests get <test-id>
+pup synthetics tests search --text "login"
+pup synthetics locations list
+```
+
+### On-Call
+```bash
+pup on-call teams list
+# Pick a real team id from `pup on-call teams list` output.
+pup on-call teams get <team-id>
+pup on-call teams memberships list <team-id>
+```
+
+### Hosts / Infrastructure
+```bash
+pup infrastructure hosts list --count 50
+pup infrastructure hosts list --filter "env:<env>"
+pup infrastructure hosts get <host-name>
+```
+
+### Events
+```bash
+pup events list --from 24h
+pup events list --tags "source:deploy"
+pup events search --query "deploy" --from 24h --limit 50
+pup events get <event-id>
+```
+
+### Downtimes
+```bash
+pup downtime list
+pup downtime create --file downtime.json
+pup downtime cancel <downtime-id>
+```
+
+### Users / Teams
+```bash
+pup users list
+pup users get <user-id>
+```
+
+### Security
+```bash
+pup security signals list --query "*" --from 1h --limit 100
+pup security signals list --query "status:open severity:critical" --from 1h --limit 100
+# Broader lookback for historical triage
+pup security signals list --query "severity:critical" --from 24h --limit 100
+```
+
+### Audit Logs
+```bash
+# List recent events
+pup audit-logs list --from 1h --limit 100
+
+# Search with query (Lucene syntax, same as Log Explorer)
+pup audit-logs search --query "@action:deleted" --from 24h
+pup audit-logs search --query "@usr.email:user@example.com" --from 7d
+pup audit-logs search --query "@evt.name:Authentication @action:login" --from 7d
+pup audit-logs search --query "@metadata.api_key.id:KEY_ID" --from 90d --limit 200
+
+# JSON output for piping to jq
+pup audit-logs search --query "@action:deleted" --from 24h -o json | jq '.data[].attributes'
+
+# audit-logs is the long form (both work)
+pup audit-logs search --query "@evt.name:Monitor @action:modified" --from 7d
+```
+
+### Service Catalog
+```bash
+pup service-catalog list
+pup service-catalog get <service-name>
+```
+
+### Notebooks
+```bash
+pup notebooks search
+pup notebooks list          # compatibility alias of search
+pup notebooks get <notebook-id>
+```
+
+`get` takes the numeric id from `pup notebooks list` or from a notebook URL. A cell's resource type is `notebook_cells`. The rendered type (`markdown`, `timeseries`, and so on) goes in `attributes.definition.type`. Sending `"type": "markdown"` at the cell resource level returns `Invalid type. Expected "notebook_cells"`.
+
+`create` and `update` take a full notebook document. `edit` appends cells, so its file is a JSON array of cell objects, not a full notebook.
+
+```json
+{
+  "data": {
+    "type": "notebooks",
+    "attributes": {
+      "name": "Investigation notebook",
+      "time": {"live_span": "4h"},
+      "cells": [
+        {
+          "type": "notebook_cells",
+          "attributes": {
+            "definition": {"type": "markdown", "text": "# Investigation notes"}
+          }
+        },
+        {
+          "type": "notebook_cells",
+          "attributes": {
+            "definition": {
+              "type": "timeseries",
+              "requests": [{"q": "max:myapp.kafka.consumer.lag{*}"}]
+            }
+          }
+        }
+      ]
+    }
+  }
+}
+```
+
+```bash
+pup notebooks create --file notebook.json
+pup notebooks update <notebook-id> --file notebook.json
+pup notebooks edit <notebook-id> --file cells.json
+```
+
+`get`, `create`, `update`, and `edit` also accept `--markdown` and then read or write a Markdown document instead of JSON cells. That path calls `/api/unstable/notebooks` and only works for rich-text notebooks. Notebooks created through the cells API have no Markdown projection. `--name` is only valid with `create --markdown`.
+
+```bash
+pup notebooks create --markdown --file doc.md
+pup notebooks get <notebook-id> --markdown
+pup notebooks update <notebook-id> --markdown --file doc.md
+pup notebooks edit <notebook-id> --markdown --file fragment.md
+```
+
+### Workflows
+```bash
+pup workflows get <workflow-id>
+pup workflows run <workflow-id> --payload '{"key":"value"}'
+pup workflows run <workflow-id> --payload-file input.json --wait --timeout 5m
+pup workflows instances list <workflow-id>
+```
+
+### Observability Pipelines
+```bash
+pup obs-pipelines list --limit 50
+pup obs-pipelines get <pipeline-id>
+pup obs-pipelines create --file pipeline.json
+pup obs-pipelines update <pipeline-id> --file pipeline.json
+pup obs-pipelines delete <pipeline-id>
+pup obs-pipelines validate --file pipeline.json
+```
+
+### LLM Observability
+```bash
+pup llm-obs projects list
+pup llm-obs projects create --file project.json
+pup llm-obs experiments list
+pup llm-obs experiments list --filter-project-id <project-id>
+pup llm-obs experiments list --filter-dataset-id <dataset-id>
+pup llm-obs experiments create --file experiment.json
+pup llm-obs experiments update <experiment-id> --file experiment.json
+pup llm-obs experiments delete --file delete-request.json
+pup llm-obs datasets list --project-id <project-id>
+pup llm-obs datasets create --project-id <project-id> --file dataset.json
+pup llm-obs spans search --ml-app <ml-app-name> --from 1h --limit 20
+```
+
+### Reference Tables
+```bash
+pup reference-tables list --limit 50
+pup reference-tables get <table-id>
+pup reference-tables create --file table.json
+pup reference-tables batch-query --file query.json
+```
+
+### Cost Cloud Configs
+```bash
+# `cost` is an alias of `costs`. Cloud configs live under the `datadog` subgroup.
+# The id on get/delete is the numeric id returned by list.
+pup costs datadog aws-config list
+pup costs datadog aws-config get <id>
+pup costs datadog aws-config create --file config.json
+pup costs datadog aws-config delete <id>
+
+pup costs datadog azure-config list
+pup costs datadog azure-config get <id>
+pup costs datadog azure-config create --file config.json
+pup costs datadog azure-config delete <id>
+
+pup costs datadog gcp-config list
+pup costs datadog gcp-config get <id>
+pup costs datadog gcp-config create --file config.json
+pup costs datadog gcp-config delete <id>
+
+# Billing totals, separate from the cloud configs above.
+pup costs datadog projected
+```
+
+## Subcommand Discovery
+
+```bash
+pup --version           # Confirm installed version before documenting workarounds
+pup --help              # List all commands
+pup <command> --help    # Command-specific help
+pup agent schema        # Machine-readable command list for the installed binary
+pup dashboards get <dashboard-id> --jq '{title, layout_type}'  # Filter output before formatting
+
+# Raw authenticated request when no subcommand covers the endpoint.
+# Relative paths are prefixed with /api/.
+pup api v1/monitor
+pup docs api            # Live API docs. No authentication required.
+```
+
+Global flags work on any command: `-o json`, `--jq`, `--org <name>`, `--yes` (skip a destructive confirmation), and `--read-only` (block create, update, and delete). When Pup detects an agent it returns JSON and auto-approves prompts. `--no-agent` turns that off.
+
+If local help differs from this skill, follow `pup <command> --help` for the installed binary. Compare `pup --version` with the latest stable release before inventing a workaround.
+
+## Error Handling
+
+| Error | Cause | Fix |
+|-------|-------|-----|
+| 401 Unauthorized | Token expired | `pup auth refresh` |
+| 403 Forbidden | Missing scope | Check app key permissions |
+| 404 Not Found | Wrong ID/resource | Verify resource exists |
+| Rate limited | Too many requests | Add delays between calls |
+
+## Install
+
+See [Setup Pup](https://github.com/datadog-labs/agent-skills/tree/main?tab=readme-ov-file#setup-pup) for installation instructions.
+
+### Verify Installation
+
+```bash
+which pup
+pup --version
+```
+
+## Sites
+
+| Site | `DD_SITE` value |
+|------|-----------------|
+| US1 (default) | `datadoghq.com` |
+| US3 | `us3.datadoghq.com` |
+| US5 | `us5.datadoghq.com` |
+| EU1 | `datadoghq.eu` |
+| AP1 | `ap1.datadoghq.com` |
+| AP2 | `ap2.datadoghq.com` |
+| US1-FED | `ddog-gov.com` |
+
+Pup trusts Datadog-owned sites automatically. Before using an unlisted host with
+`--trust-site` or `trusted_sites`, verify the exact hostname with the user and get
+their explicit approval; a typo or lookalike host could receive API-key credentials.
