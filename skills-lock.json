@@ -295,12 +295,11 @@
       "skillPath": "skills/redis-core/SKILL.md",
       "computedHash": "3b6196044dfba0f77942f20030faab03ca0741c396ba8d759c179710ebd2a7dd"
     },
-    "resolving-merge-conflicts": {
-      "source": "mattpocock/skills",
-      "ref": "v1.2.3",
+    "resolve-merge-conflicts": {
+      "source": "warpdotdev/common-skills",
       "sourceType": "github",
-      "skillPath": "skills/engineering/resolving-merge-conflicts/SKILL.md",
-      "computedHash": "28aad6f8b1b7025abc8892fa8890f68fe1533499b28a565f416b159131d22fad"
+      "skillPath": ".agents/skills/resolve-merge-conflicts/SKILL.md",
+      "computedHash": "5376b5692901c624e8f20a5a04aeea5f5a94f5168d29852a8a639aded6408f2e"
     },
     "service-virtualization": {
       "source": "petrkindlmann/qa-skills",
